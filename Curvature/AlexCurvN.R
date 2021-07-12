@@ -179,3 +179,77 @@ plot( distan[,1], type = 'l')
 lines(distan[,2], type = 'l')
 
 
+
+curvatures = c()
+for (i in 1:1000){
+  a = c(0,runif(2, min = 0, max = 1))
+  b = c(0,runif(2, min = 0, max = 1))
+  c = c(0,runif(2, min = 0, max = 1))
+  P = matrix(c(a,b, c),nrow=length(a))
+  curvatures = c(curvatures, curvature(P))
+}
+
+sum(curvatures==0)/length(curvatures) #0.645 # 0.6653
+sum(curvatures==1)/length(curvatures) #0.282 # 0.246
+sum(curvatures==-1)/length(curvatures) #0.073 #0.0887
+
+
+
+
+
+library(ape)
+library(adephylo)
+# non ultrametric
+Tr = rtree(3, br = runif, min = 0, max = 2)
+# ultrametric
+Tr_ultra=as.phylo(as.hclust(chronos(Tr, lambda=0) ))
+#plot(Tr, type = "cladogram",label.offset = 0.05)
+#nodelabels()
+#tiplabels()
+#length(Tr$edge.length)
+#dists = distTips(Tr_ultra, tips = "all", method = "patristic", useC = TRUE)
+
+
+projTroursPt <- function (leaves, ultra = F){
+  Tr = rtree(leaves)
+  if (ultra) Tr = as.phylo(as.hclust(chronos(Tr, lambda=0, quiet=TRUE) ))
+  Trd = distTips(Tr, tips = "all", method = "patristic", useC = TRUE)
+  pt = Trd - Trd[1]
+  return( pt)
+}
+curvatures = c()
+for (i in 1:1000){
+  isTriangle = F
+  while(isTriangle != TRUE){
+    a = round(as.numeric(projTroursPt(5, T), 8))
+    b = round(as.numeric(projTroursPt(5, T), 8))
+    c = round(as.numeric(projTroursPt(5, T), 8))
+    if ((identical(a,b) == F) & (identical(a,c) == FALSE) & (identical(b,c) == FALSE)) isTriangle = TRUE
+  }
+  P = matrix(c(a,b, c),nrow=length(a))
+  curvatures = c(curvatures, curvature(P))
+}
+sum(curvatures==0)/length(curvatures) 
+sum(curvatures==1)/length(curvatures) 
+sum(curvatures==-1)/length(curvatures) 
+
+
+# ultrametrics 5 leaves
+# undefined 0.977
+# positive 0.021
+# negative 0.002
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
