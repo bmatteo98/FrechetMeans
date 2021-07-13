@@ -1,3 +1,5 @@
+dtr <- function (x, y) return (max(x-y) - min(x-y))
+deu <- function (x, y) return (sqrt(sum((x-y)^2)))
 
 trSegmentN <- function (u, v){
   N = length(u) 
@@ -14,47 +16,50 @@ trSegmentN <- function (u, v){
     L [i,] = y
   }
   L[N,] = u
-  #print(L)
-  t = seq(0,1,length.out = 100)
+  a = 0
   TrSegment = matrix(NA, nrow = 1, ncol = N)
   for (j in 1:(N-1)){
     y1 = L[j,]
     y2 = L[j+1,]
+    b = a+dtr(y1, y2)
+    t = seq(a,b,by=0.001)
     segment = matrix(NA, nrow = length(t), ncol = N)
     for (i in 1:length(t)){
       tk = t[i]
-      segment[i,] =  (1-tk)*y1+tk*y2
+      segment[i,] =  (1-(tk-a)/(b-a))*y1+(tk-a)*y2/(b-a)
     }
     TrSegment = rbind(TrSegment, segment)
+    a = b
   }
   return (TrSegment[-1,])
 }
 
-trSegment = trSegmentN(c,b)
-plot(trSegment[,1], trSegment[,2], type = 'l')
+#trSegment = trSegmentN(c,a)
+#plot(trSegment[,2], trSegment[,3], type = 'l', col = 'red')
+#trSegment = trSegmentN(c,b)
+#plot(trSegment[,1], trSegment[,2], type = 'l')
 
 
-euclSegmentN <- function(u,v){
+euclSegmentN <- function(u,v,d){
   N = length(u)
-  t = seq(0,1, length.out = 100*(N-1))
+  a = 0
+  b = dtr(u,v)
+  t = seq(a,b,length.out = d)
   EuclSegment = matrix(NA, nrow = length(t), ncol = N)
   for(i in 1:length(t)){
     tk = t[i]
-    EuclSegment[i,] =  (1-tk)*v+tk*u
+    EuclSegment[i,] =  (1-(tk-a)/(b-a))*v+(tk-a)*u/(b-a)
   }
   return (EuclSegment)
 }
 
-euclSegment = euclSegmentN(c,b)
-plot(euclSegment[,1], euclSegment[,2], type = 'l')
-
-dtr <- function (x, y) return (max(x-y) - min(x-y))
-deu <- function (x, y) return (sqrt(sum((x-y)^2)))
+#euclSegment = euclSegmentN(c1,b1,302)
+#plot(euclSegment[,1], euclSegment[,2], type = 'l')
 
 distancesN <- function(a, b, c, a1, b1, c1){
-  euclSeg = euclSegmentN(a1,b1)
   trSeg = trSegmentN(a,b)
-  n = nrow(euclSeg)
+  euclSeg = euclSegmentN(a1,b1, nrow(trSeg))
+  n = nrow(euclSeg) # they should be the same
   distanN = matrix(NA, nrow = n, ncol = 2)
   for (i in 1: n){
     ptTR = trSeg[i,]
@@ -76,7 +81,7 @@ findEuclideanN <- function (P){
   a1 = rep(0,N)
   b1 = c(dab, rep(0, N-1))
   xc = (dac^2-dbc^2+dab^2)/(2*dab)
-  if (abs(round(xc, 5)) == abs(round(dac, 5))) yc = 0
+  if (abs(round(xc, 8)) == abs(round(dac, 8))) yc = 0
   else yc = sqrt(dac^2-xc^2)
   c1 = c(xc, yc, rep(0, N-2))
   P1 <- matrix(c(a1,b1, c1),nrow=length(a1))
@@ -96,13 +101,14 @@ curvature <- function (P){
     a1 = P1[,j%%ncol(P1)+1]
     b1 = P1[,(j+1)%%ncol(P1)+1]
     c1 = P1[,(j+2)%%ncol(P1)+1]
-    distan = round(distancesN (a,b,c,a1,b1,c1), 5)
-    if (all(distan[,1] <= distan[,2])) curvS = curvS +1 
+    distan = round(distancesN (a,b,c,a1,b1,c1), 8)
+    if (all(distan[,1] == distan[,2])) sameDist = sameDist +1
+    else if (all(distan[,1] <= distan[,2])) curvS = curvS +1 
     else if (all(distan[,1] >= distan[,2])) curvF = curvF +1
     else (return (0))
   }
-  if (curvS == 3) return (-1)
-  if (curvF == 3) return (1)
+  if ((sameDist+curvS) == 3) return (-1)
+  if ((sameDist+curvF) == 3) return (1)
   else return (0)
 }
 
@@ -148,6 +154,10 @@ c = c(0,452,256)
 a = c(0,0)
 b = c(1, 0)
 c = c(1,1)
+
+a = c(0,a)
+b = c(0,b)
+c = c(0,c)
 P = matrix(c(a,b, c),nrow=length(a))
 curvature(P)
 
@@ -165,12 +175,12 @@ deu(P1[,1], P1[,3])
 deu(P1[,3], P1[,2])
 
 
-distan = distancesN (a,b,c,P1[,1],P1[, 2],P1[, 3])
+distanN = distancesN (a,b,c,P1[,1],P1[, 2],P1[, 3])
 #t = seq(0,1, length.out = nrow(distan))
-plot( distan[,1], type = 'l')
-lines(distan[,2], type = 'l')
+plot( distanN[,1], type = 'l', col = 'red')
+lines(distanN[,2], type = 'l', col = 'red')
 
-distan = distancesN (a,c,b,a1,c1,b1)
+distan = distancesN (c,a,b,c1,a1,b1)
 plot( distan[,1], type = 'l')
 lines(distan[,2], type = 'l')
 
@@ -181,7 +191,7 @@ lines(distan[,2], type = 'l')
 
 
 curvatures = c()
-for (i in 1:1000){
+for (i in 1:100){
   a = c(0,runif(2, min = 0, max = 1))
   b = c(0,runif(2, min = 0, max = 1))
   c = c(0,runif(2, min = 0, max = 1))

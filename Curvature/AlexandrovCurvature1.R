@@ -65,7 +65,7 @@ tropicalLine <-  function (x,y, tk) {
 }
 
 distances <- function (a,b,c,x1,y1,c1){
-  t <- seq(0,1, by= 0.01)
+  t <- seq(0,1, length.out = 200)
   distan = matrix(NA, nrow = length(t),ncol = 2)
   if (x1[1]>=y1[1]) {
     a1 = y1
@@ -79,9 +79,9 @@ distances <- function (a,b,c,x1,y1,c1){
     tk = t[i]
     muTR = tropicalLine (a,b,tk)
     muE= (1-tk)*a1+b1*tk
-    distan[i,] =  c(deu(muE, c1), dtr(muTR, c))
+    distan[i,] =  c( dtr(muTR, c), deu(muE, c1))
   }
-  distan = round(distan , 7)
+  distan = round(distan , 8)
   if ((distan[1,1] ==distan[length(t),2]) & (distan[1,2] ==distan[length(t),1])){
     distan[,1] = rev(distan[,1])
   }
@@ -98,7 +98,7 @@ findEuclidean <- function (P){
   a1 = c(0,0)
   b1 = c(dab,0)
   xc = (dac^2-dbc^2+dab^2)/(2*dab)
-  if (abs(round(xc, 5)) == abs(round(dac, 5))) yc = 0
+  if (abs(round(xc, 8)) == abs(round(dac, 8))) yc = 0
   else yc = sqrt(dac^2-xc^2)
   c1 = c(xc, yc)
   P1 <- matrix(c(a1,b1, c1),nrow=length(a1))
@@ -109,6 +109,7 @@ curvature <- function (P){
   P1 <- findEuclidean(P)
   curvS = 0
   curvF = 0
+  sameDist = 0
   for (j in 1:ncol(P)){
     a = P[,j%%ncol(P)+1]
     b = P[,(j+1)%%ncol(P)+1]
@@ -116,13 +117,14 @@ curvature <- function (P){
     a1 = P1[,j%%ncol(P1)+1]
     b1 = P1[,(j+1)%%ncol(P1)+1]
     c1 = P1[,(j+2)%%ncol(P1)+1]
-    distan = round(distances (a,b,c,a1,b1,c1), 5)
-    if (all(distan[,1] <= distan[,2])) curvF = curvF +1 
-    else if (all(distan[,1] >= distan[,2])) curvS = curvS +1
+    distan = round(distances (a,b,c,a1,b1,c1), 8)
+    if (all(distan[,1] == distan[,2])) sameDist = sameDist +1
+    else if (all(distan[,1] <= distan[,2])) curvS = curvS +1 
+    else if (all(distan[,1] >= distan[,2])) curvF = curvF +1
     else (return (0))
   }
-  if (curvS == 3) return (-1)
-  if (curvF == 3) return (1)
+  if ((sameDist+curvS) == 3) return (-1)
+  if ((sameDist+curvF) == 3) return (1)
   else return (0)
 }
 
@@ -167,9 +169,37 @@ b = c(1, 0)
 c = c(1,1)
 
 #P is the tropical triangle
-P<- matrix(c(a,b, c),nrow=length(a))
+P<- matrix(c(a[-1],b[-1], c[-1]),ncol=length(a))
 
 curvature(P)
+
+
+P1 <- findEuclidean(P)
+a1 = P1[,1]
+b1= P1[, 2]
+c1 = P1[, 3]
+distan2 = distances (a[-1],b[-1],c[-1],P1[,1],P1[, 2],P1[, 3])
+t <- seq(0,1, length.out = 200)
+plot(t, distan2[,2], type = 'l')
+lines(t, distan2[,1], type = 'l')
+
+distan2 = distances (b[-1],c[-1],a[-1],P1[,2],P1[, 3],P1[, 1])
+t <- seq(0,1, length.out = 200)
+plot(t, distan2[,2], type = 'l')
+lines(t, distan2[,1], type = 'l')
+
+distan2 = distances (a[-1],c[-1],b[-1],P1[,1],P1[, 3],P1[, 2])
+t <- seq(0,1, length.out = 200)
+plot(t, distan2[,2], type = 'l')
+lines(t, distan2[,1], type = 'l')
+
+
+
+
+
+
+
+
 
 curvatures = c()
 for (i in 1:100){
