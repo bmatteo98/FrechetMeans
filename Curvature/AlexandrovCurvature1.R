@@ -268,7 +268,8 @@ plot(trLine[,1], trLine[,2], type = 'l', col = 'red')
 
 
 set.seed(12346) # one type three classified wrong
-set.seed(123456)
+set.seed(123456) # 2 0 curved
+set.seed(1234567) 
 curvatures = c()
 Ps= list()
 for (i in 1:10){
