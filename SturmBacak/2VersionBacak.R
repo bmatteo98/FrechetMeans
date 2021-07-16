@@ -65,7 +65,7 @@ bacak_sequence <- function (x,y, lambda, w) {
     return ((1-tk)*x+y*tk)
     break
   }
-  
+
   if (x[1]<y[1]) {
     a = x
     b = y

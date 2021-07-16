@@ -2,17 +2,18 @@
 tropicalLine <-  function (x,y, tk) {
   if (identical(x,y)) {
     mu =  (x)
-    
+    return (mu)
   }
   if ((x[1] == y[1]) | (x[2] == y[2])) {
     mu = ((1-tk)*x+y*tk)
-    
+    return (mu)
   }
   
-  if ((x[1] == x[2]) | (y[1] == y[2])){
+  if ((x[1] == x[2]) & (y[1] == y[2])){
     mu = ((1-tk)*x+y*tk)
-    
+    return (mu)
   }
+  
   
   if (x[1]<y[1]) {
     a = x
@@ -60,10 +61,10 @@ a = runif(2, min = -1, max = 0)
 b = runif(2, min = -1, max = 0)
 c = runif(2, min = -1, max = 0)
 
-b = c(5,5)
-a = c(4,6)
+
+
 trLine = c()
-t = seq(0,1, length.out = 200)
+t = seq(0,1, length.out = 402)
 for (ti in t){
   trLine = rbind(trLine, tropicalLine(a,b,ti))
 }
@@ -104,7 +105,7 @@ trSegmentN <- function (u, v){
 }
 
 trSegment = trSegmentN(c,a)
-lines(trSegment[,2], trSegment[,3], type = 'l', col = 'red')
+plot(trSegment[,2], trSegment[,3], type = 'l', col = 'red')
 points(b[2], b[3], pch = 16)
 points(c[2], c[3], pch = 16)
 points(a[2], a[3], pch = 16)

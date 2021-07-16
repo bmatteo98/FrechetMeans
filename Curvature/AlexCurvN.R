@@ -22,23 +22,25 @@ trSegmentN <- function (u, v){
     y1 = L[j,]
     y2 = L[j+1,]
     b = a+dtr(y1, y2)
-    t = seq(a,b,by=0.01)
-    if (a == b) segment = y1
+    t = seq(a,b,by=0.001)
+    t = t[-length(t)]
+    segment = c()
+    if (a == b) a = b
     else{
-      segment = matrix(NA, nrow = length(t), ncol = N)
+      segment = c()
       for (i in 1:length(t)){
         tk = t[i]
-        segment[i,] =  (1-(tk-a)/(b-a))*y1+(tk-a)*y2/(b-a)
+        segment =  rbind(segment, (1-(tk-a)/(b-a))*y1+(tk-a)*y2/(b-a))
       }
+      TrSegment = rbind(TrSegment, segment)
     }
-    TrSegment = rbind(TrSegment, segment)
-    a = b
+    #TrSegment = rbind(TrSegment, segment)
   }
-  
+  TrSegment = rbind(TrSegment, u)
   return (TrSegment)
 }
 
-trSegment = trSegmentN(b,c)
+trSegment = trSegmentN(b,a)
 #plot(trSegment[,2], trSegment[,3], type = 'l', col = 'red')
 #trSegment = trSegmentN(c,b)
 #plot(trSegment[,1], trSegment[,2], type = 'l')
@@ -74,7 +76,7 @@ distancesN <- function(a, b, c, a1, b1, c1){
   }
   return (distanN)
 }
-dist = distancesN(b,c,a,b1,c1,a1)
+#dist = distancesN(b,c,a,b1,c1,a1)
 #dist = distancesN(P[,1],P[,2], P[,3], P1[,1], P1[,2],P1[,3] )
 
 findEuclideanN <- function (P){
@@ -113,7 +115,7 @@ curvature <- function (P){
     a1 = P1[,one]
     b1 = P1[,two]
     c1 = P1[,three]
-    distan = round(distancesN (a,b,c,a1,b1,c1), 8)
+    distan = round(distancesN (a,b,c,a1,b1,c1), 5)
     if (all(distan[,1] == distan[,2])) sameDist = sameDist +1
     else if (all(distan[,1] <= distan[,2])) curvS = curvS +1 
     else if (all(distan[,1] >= distan[,2])) curvF = curvF +1
@@ -132,7 +134,7 @@ plotTRN <- function (P,cv){
   yl = c(min(a[3], b[3], c[3]),max(a[3], b[3], c[3]) )
   trSegment = trSegmentN(a,b)
   par(mfrow=c(2,2))
-  plot(trSegment[,2], trSegment[,3], type = 'l', col = 'red', xlim = xl, ylim = yl, main = cv)
+  plot(trSegment[,2], trSegment[,3], type = 'l', col = 'red', xlim = xl, ylim = yl, main = paste(cv, "N-dim"))
   trSegment = trSegmentN(c,b)
   lines(trSegment[,2], trSegment[,3], type = 'l', col = 'blue' )
   trSegment = trSegmentN(a,c)
@@ -203,10 +205,7 @@ P = matrix(c(a,b, c),nrow=length(a))
 curvature(P)
 
 
-P1 <- findEuclideanN(P)
-a1 = P1[,1]
-b1= P1[, 2]
-c1 = P1[, 3]
+
 dtr(P[,1], P[,2])
 dtr(P[,1], P[,3])
 dtr(P[,3], P[,2])
@@ -225,89 +224,25 @@ distan = distancesN (c,a,b,c1,a1,b1)
 plot(distan[,2], type = 'l')
 lines( distan[,1], type = 'l')
 
-distan = distancesN (b,c,a,b1,c1,a1)
-
-plot(distan[,2], type = 'l', col = 'red')
-lines( distan[,1], type = 'l')
-
-
-curvatures = c()
-for (P in Ps){
-  #a = c(0,runif(2, min = 0, max = 10))
-  #b = c(0,runif(2, min = 0, max = 10))
-  #c = c(0,runif(2, min = 0, max = 10))
-  #a = c(0,sample(-10:10, size = 2, replace = TRUE))
-  #b = c(0,sample(-10:10, size = 2, replace = TRUE))
-  #c  = c(0,sample(-10:10, size = 2, replace = TRUE))
-  #P = matrix(c(a,b, c),nrow=length(a))
-  #print(P)
-  Pz = rbind(rep(0,3), P)
-  cv = curvature(Pz)
-  curvatures = c(curvatures, cv)
-    print(Pz)
-    plotTRN(Pz, cv)
-}
-plot(1,1)
-sum(curvatures==0)/length(curvatures) #0.645 # 0.6653
-sum(curvatures==1)/length(curvatures) #0.282 # 0.246
-sum(curvatures==-1)/length(curvatures) #0.073 #0.0887
-sum(curvatures=="undefined")/length(curvatures) 
-# same proportions in [-1, 0] and [0,1]
-
-
-a= c(0,-9,3)
-b= c(0,4,3)
-c = c(0,4,-8)
+a = c(0,2,6)
+b = c(0,1,5)
+c = c( 0, 4,10)
 P = matrix(c(a,b, c),nrow=length(a))
-plotTR(P)
+P1 <- findEuclideanN(P)
+a1 = P1[,1]
+b1= P1[, 2]
+c1 = P1[, 3]
+distanC = distancesN (b,a,c,b1,a1,c1)
+plot(distan[,2], type = 'l', col = 'red')
+lines( distan[,1], type = 'l', col = 'blue')
 
-library(ape)
-library(adephylo)
-# non ultrametric
-Tr = rtree(3, br = runif, min = 0, max = 2)
-# ultrametric
-Tr_ultra=as.phylo(as.hclust(chronos(Tr, lambda=0) ))
-#plot(Tr, type = "cladogram",label.offset = 0.05)
-#nodelabels()
-#tiplabels()
-#length(Tr$edge.length)
-#dists = distTips(Tr_ultra, tips = "all", method = "patristic", useC = TRUE)
+distanB = distancesN (c,a,b,c1,a1,b1)
+plot(distan[,2], type = 'l', col = 'red')
+lines( distan[,1], type = 'l', col = 'blue')
 
-
-projTroursPt <- function (leaves, ultra = F){
-  Tr = rtree(leaves)
-  if (ultra) Tr = as.phylo(as.hclust(chronos(Tr, lambda=0, quiet=TRUE) ))
-  Trd = distTips(Tr, tips = "all", method = "patristic", useC = TRUE)
-  pt = Trd - Trd[1]
-  return( pt)
-}
-curvatures = c()
-for (i in 1:1000){
-  isTriangle = F
-  while(isTriangle != TRUE){
-    a = round(as.numeric(projTroursPt(5, T), 8))
-    b = round(as.numeric(projTroursPt(5, T), 8))
-    c = round(as.numeric(projTroursPt(5, T), 8))
-    if ((identical(a,b) == F) & (identical(a,c) == FALSE) & (identical(b,c) == FALSE)) isTriangle = TRUE
-  }
-  P = matrix(c(a,b, c),nrow=length(a))
-  curvatures = c(curvatures, curvature(P))
-}
-sum(curvatures==0)/length(curvatures) 
-sum(curvatures==1)/length(curvatures) 
-sum(curvatures==-1)/length(curvatures) 
-
-
-# ultrametrics 5 leaves
-# undefined 0.977
-# positive 0.021
-# negative 0.002
-
-
-
-
-
-
+distanA = distancesN (b,c,a,b1,c1,a1)
+plot(distan[,2], type = 'l', col = 'red')
+lines( distan[,1], type = 'l', col = 'blue')
 
 
 

@@ -16,7 +16,7 @@ c = c(452,256)
 
 
 P<- matrix(c(a,b, c),nrow=length(a))
-K = 1000000
+K = 100000
 N = 10
 epsilon = 0.0001
 
@@ -31,7 +31,7 @@ dtr <- function (x, y){
   y = c(0,y)
   return (max(x-y) - min(x-y))
 }
-de <- function (x, y) return (sqrt(sum((x-y)^2)))
+deu <- function (x, y) return (sqrt(sum((x-y)^2)))
 sosd <- function (d, mu, P) {
   sos = 0
   for (i in 1:ncol(P)){
@@ -41,6 +41,64 @@ sosd <- function (d, mu, P) {
   return (sos)
 }
 
+tropicalLine <-  function (x,y, tk) {
+  if (identical(x,y)) {
+    mu =  (x)
+    return (mu)
+  }
+  if ((x[1] == y[1]) | (x[2] == y[2])) {
+    mu = ((1-tk)*x+y*tk)
+    return (mu)
+  }
+  
+  if ((x[1] == x[2]) & (y[1] == y[2])){
+    mu = ((1-tk)*x+y*tk)
+    return (mu)
+  }
+  
+  if (x[1]<y[1]) {
+    a = x
+    b = y
+  }
+  if (x[1]>y[1]) {
+    a = y
+    b = x
+  }
+  if ((a[2]<b[2]) & ((a[1]-a[2])<=(b[1]-b[2]))){
+    t = (b[2]-a[2])/(b[1]-a[1])
+    if (tk <= t) {
+      mu = c(a[1]+tk*(b[1]-a[1]), a[2]+tk*(b[1]-a[1]))
+    }
+    if (t < tk) {
+      mu = c(a[1]+tk*(b[1]-a[1]), b[2])
+      
+    }
+  }
+  
+  if ((a[2]<b[2]) & ((a[1]-a[2])>(b[1]-b[2]))){
+    t = (b[1]-a[1])/(b[2]-a[2])
+    if (t >= tk) {
+      mu = c(a[1]+tk*(b[2]-a[2]), a[2]+tk*(b[2]-a[2]))
+    }
+    if (t < tk) {
+      mu = c(b[1],a[2]+tk*(b[2]-a[2]))
+      
+    }
+  }
+  
+  if (a[2]>b[2]){
+    t = (a[2]-b[2])/(a[2]-b[2]+b[1]-a[1])
+    if (t >= tk) {
+      mu = c(a[1],a[2]-tk*(a[2]-b[2]+b[1]-a[1]))
+    }
+    if (t < tk) {
+      mu = c(a[1]+b[2]-a[2]+tk*(a[2]-b[2]+b[1]-a[1]),b[2])
+    }
+  }
+  return (mu)
+}
+
+# no
 inductive_mean <- function (x,y,k) {
   if (identical(x,y)) {
     return (x)
@@ -55,10 +113,6 @@ inductive_mean <- function (x,y,k) {
     break
   }
   
-  if ((x[1] == x[2]) | (y[1] == y[2])){
-    return ((1-1/k)*x+y/k)
-    break
-  }
   if ((x[1] == x[2]) & (y[1] == y[2])){
     return ((1-1/k)*x+y/k)
     break
@@ -114,8 +168,10 @@ FrechetStrum <- function (P, K, N, epsilon){
   for (k in 1:K){
     p = P[,sample(ncol(P),size=1)]
     muk=mu
-    mu = inductive_mean(muk, p, k+1)
-    d = c(d, de(muk, mu))
+    tk = 1/(k+1)
+    mu = tropicalLine(muk, p, tk )
+    #mu = inductive_mean(muk, p, k+1 )
+    d = c(d, deu(muk, mu))
     ld = length(d)
     if (ld>N){
       if (all(d[c((ld-N):ld )]<epsilon) ) {

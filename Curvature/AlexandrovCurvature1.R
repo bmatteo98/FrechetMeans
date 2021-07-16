@@ -65,7 +65,7 @@ tropicalLine <-  function (x,y, tk) {
 }
 
 distances <- function (x,y,z,x1,y1,c1){
-  t <- seq(0,1, length.out = 200)
+  t <- seq(0,1, length.out = 402)
   distan = matrix(NA, nrow = length(t),ncol = 2)
   if (x1[1]>=y1[1]) {
     a1 = y1
@@ -241,7 +241,11 @@ t <- seq(0,1, length.out = 200)
 plot(t, distan2[,2], type = 'l')
 lines(t, distan2[,1], type = 'l')
 
-distan2 = distances (c,b,a,P1[,3],P1[, 2],P1[, 1])
+
+a = c(4,10)
+b = c(6,8)
+c = c( 7,5)
+distan2 = distances (b,c,a,P1[,2],P1[, 3],P1[, 1])
 #t <- seq(0,1, length.out = 200)
 plot(distan2[,2], type = 'l', col = 'red')
 lines(distan2[,1], type = 'l', col = 'blue')
@@ -270,21 +274,27 @@ plot(trLine[,1], trLine[,2], type = 'l', col = 'red')
 set.seed(12346) # one type three classified wrong
 set.seed(123456) # 2 0 curved
 set.seed(1234567) 
+set.seed(333)
 curvatures = c()
 Ps= list()
-for (i in 1:10){
+for (i in 1:1000){
   #a = runif(2, min = 0, max = 10)
   #b = runif(2, min = 0, max = 10)
   #c = runif(2, min = 0, max = 10)
   x = sample(1:10, size = 2, replace = TRUE)
-  y  = sample(c(1:10)[-x], size = 2, replace = TRUE)
-  z  = sample(c(1:10)[c(-x, -y)], size = 2, replace = TRUE)
+  y  = sample(c(1:10), size = 2, replace = TRUE)
+  z  = sample(c(1:10), size = 2, replace = TRUE)
+  while ((identical(x,y)) | (identical(x,z)) | (identical(z,y))){ 
+    x = c(0,sample(0:10, size = 2, replace = TRUE))
+    y = c(0,sample(c(0:10), size = 2, replace = TRUE))
+    z  = c(0,sample(c(0:10), size = 2, replace = TRUE))
+  }
   P = matrix(c(x,y, z),nrow=length(x))
   cv = curvature(P)
   curvatures = c(curvatures, cv)
-    print(P)
-    plotTR2(P, cv)
-  Ps[[i]] = P
+    #print(P)
+    #plotTR2(P, cv)
+  #Ps[[i]] = P
 }
 plot(1,1)
 sum(curvatures==0)/length(curvatures) #0.645 # 0.6653
