@@ -10,16 +10,16 @@ deu <- function (x, y) return (sqrt(sum((x-y)^2)))
 tropicalLine <-  function (x,y, tk) {
   if (identical(x,y)) {
     mu =  (x)
-    
+    return (mu)
   }
   if ((x[1] == y[1]) | (x[2] == y[2])) {
     mu = ((1-tk)*x+y*tk)
-    
+    return (mu)
   }
   
-  if ((x[1] == x[2]) | (y[1] == y[2])){
+  if ((x[1] == x[2]) & (y[1] == y[2])){
     mu = ((1-tk)*x+y*tk)
-    
+    return (mu)
   }
   
   if (x[1]<y[1]) {
@@ -64,7 +64,7 @@ tropicalLine <-  function (x,y, tk) {
   return (mu)
 }
 
-distances <- function (a,b,c,x1,y1,c1){
+distances <- function (x,y,z,x1,y1,c1){
   t <- seq(0,1, length.out = 200)
   distan = matrix(NA, nrow = length(t),ncol = 2)
   if (x1[1]>=y1[1]) {
@@ -75,11 +75,15 @@ distances <- function (a,b,c,x1,y1,c1){
     a1=x1
     b1=y1
   }
+  EUsegment = c()
   for (i in 1:length(t)){
     tk = t[i]
-    muTR = tropicalLine (a,b,tk)
+
+    muTR = tropicalLine (x,y,tk)
+
     muE= (1-tk)*a1+b1*tk
-    distan[i,] =  c( dtr(muTR, c), deu(muE, c1))
+    EUsegment = rbind(EUsegment, muE)
+    distan[i,] =  c( dtr(muTR, z), deu(muE, c1))
   }
   distan = round(distan , 8)
   if ((distan[1,1] ==distan[length(t),2]) & (distan[1,2] ==distan[length(t),1])){
@@ -87,6 +91,8 @@ distances <- function (a,b,c,x1,y1,c1){
   }
   return (distan)
 }
+
+#dist2 = distances(b[-1],c[-1],a[-1],P1[,2],P1[,3],P1[,1])
 
 findEuclidean <- function (P){
   a = P[,1]
@@ -105,28 +111,75 @@ findEuclidean <- function (P){
   return (P1)
 }
 
+
 curvature <- function (P){
   P1 <- findEuclidean(P)
   curvS = 0
   curvF = 0
   sameDist = 0
-  for (j in 1:ncol(P)){
-    a = P[,j%%ncol(P)+1]
-    b = P[,(j+1)%%ncol(P)+1]
-    c = P[,(j+2)%%ncol(P)+1]
-    a1 = P1[,j%%ncol(P1)+1]
-    b1 = P1[,(j+1)%%ncol(P1)+1]
-    c1 = P1[,(j+2)%%ncol(P1)+1]
+  perm = matrix(c(1,2,3,2,3,1,1,3,2), nrow = 3, byrow = TRUE)
+  for (j in 1:3){
+    one = perm[j,1]
+    two = perm[j,2]
+    three = perm[j,3]
+    a = P[,one]
+    b = P[,two]
+    c = P[,three]
+    a1 = P1[,one]
+    b1 = P1[,two]
+    c1 = P1[,three]
     distan = round(distances (a,b,c,a1,b1,c1), 8)
     if (all(distan[,1] == distan[,2])) sameDist = sameDist +1
     else if (all(distan[,1] <= distan[,2])) curvS = curvS +1 
     else if (all(distan[,1] >= distan[,2])) curvF = curvF +1
-    else (return (0))
+    else (return ("undefined"))
   }
-  if ((sameDist+curvS) == 3) return (-1)
-  if ((sameDist+curvF) == 3) return (1)
-  else return (0)
+  if (sameDist == 3) return (0)
+  else if ((sameDist+curvS) == 3) return (-1)
+  else if ((sameDist+curvF) == 3) return (1)
+  else return ("undefined")
 }
+plotTR2 <- function (P, cv){
+  x = P[,1]
+  y = P[,2]
+  z = P[,3]
+  xl = c(min(x[1], y[1], z[1]),max(x[1], y[1], z[1]) )
+  yl = c(min(x[2], y[2], z[2]),max(x[2], y[2], z[2]) )
+  trLine = c()
+  t = seq(0,1, length.out = 200)
+  for (ti in t){
+    trLine = rbind(trLine, tropicalLine(x,y,ti))
+  }
+  par(mfrow=c(2,2), mar = rep(2, 4))
+  plot(trLine[,1], trLine[,2], type = 'l', col = 'red', xlim = xl, ylim = yl, main = paste(cv, "2-dim"))
+  trLine = c()
+  for (ti in t){
+    trLine = rbind(trLine, tropicalLine(y,z,ti))
+  }
+  lines(trLine[,1], trLine[,2], type = 'l', col = 'blue' )
+  trLine = c()
+  for (ti in t){
+    trLine = rbind(trLine, tropicalLine(x,z,ti))
+  }
+  lines(trLine[,1], trLine[,2], type = 'l', col = 'green')
+  points(x[1], x[2], pch = 16)
+  points(y[1], y[2], pch = 16)
+  points(z[1], z[2], pch = 16)
+  P1 = findEuclidean(P)
+  distan = distances (x,y,z,P1[,1],P1[,2],P1[, 3])
+  yl = c(min(distan[,2], distan[,1]), max(distan[,2], distan[,1]))
+  plot(distan[,2], type = 'l', col = 'blue', main = 'c from a-b', ylim = yl)
+  lines( distan[,1], type = 'l', col = 'red')
+  distan = distances (x,z,y,P1[,1],P1[,3],P1[,2])
+  yl = c(min(distan[,2], distan[,1]), max(distan[,2], distan[,1]))
+  plot(distan[,2], type = 'l', col = 'blue', main = 'b from a-c', ylim = yl)
+  lines( distan[,1], type = 'l', col = 'red')
+  distan = distances (y,z,x,P1[,2],P1[,3],P1[,1])
+  yl = c(min(distan[,2], distan[,1]), max(distan[,2], distan[,1]))
+  plot(distan[,2], type = 'l', col = 'blue', main = 'a from b-c', ylim = yl)
+  lines( distan[,1], type = 'l', col = 'red')
+}
+
 
 
 # skinny triangle
@@ -170,7 +223,7 @@ c = c(1,1)
 
 #P is the tropical triangle
 P<- matrix(c(a[-1],b[-1], c[-1]),ncol=length(a))
-
+P = matrix(c(a,b, c),nrow=length(a))
 curvature(P)
 
 
@@ -188,32 +241,60 @@ t <- seq(0,1, length.out = 200)
 plot(t, distan2[,2], type = 'l')
 lines(t, distan2[,1], type = 'l')
 
-distan2 = distances (a[-1],c[-1],b[-1],P1[,1],P1[, 3],P1[, 2])
+distan2 = distances (c,b,a,P1[,3],P1[, 2],P1[, 1])
+#t <- seq(0,1, length.out = 200)
+plot(distan2[,2], type = 'l', col = 'red')
+lines(distan2[,1], type = 'l', col = 'blue')
+all(distan2[,1] >= distan2[,2])
+
+distan2 = distances (a,c,b,P1[,1],P1[, 3],P1[, 2])
 t <- seq(0,1, length.out = 200)
-plot(t, distan2[,2], type = 'l')
-lines(t, distan2[,1], type = 'l')
+plot( distan2[,2], type = 'l')
+lines( distan2[,1], type = 'l')
 
+plot(distan2[,1], type = 'l')
+lines(distan[,2], type = 'l', col = 'red' )
 
-
-
-
-
-
-
-
-curvatures = c()
-for (i in 1:100){
-  a = runif(2, min = -1, max = 0)
-  b = runif(2, min = -1, max = 0)
-  c = runif(2, min = -1, max = 0)
-  P = matrix(c(a,b, c),nrow=length(a))
-  curvatures = c(curvatures, curvature(P))
+c = c(8,7)
+b = c(8,2)
+trLine = c()
+t = seq(0,1, length.out = 200)
+for (ti in t){
+  trLine = rbind(trLine, tropicalLine(c,b,ti))
 }
+plot(trLine[,1], trLine[,2], type = 'l', col = 'red')
 
+
+
+
+set.seed(12346) # one type three classified wrong
+set.seed(123456)
+curvatures = c()
+Ps= list()
+for (i in 1:10){
+  #a = runif(2, min = 0, max = 10)
+  #b = runif(2, min = 0, max = 10)
+  #c = runif(2, min = 0, max = 10)
+  x = sample(1:10, size = 2, replace = TRUE)
+  y  = sample(c(1:10)[-x], size = 2, replace = TRUE)
+  z  = sample(c(1:10)[c(-x, -y)], size = 2, replace = TRUE)
+  P = matrix(c(x,y, z),nrow=length(x))
+  cv = curvature(P)
+  curvatures = c(curvatures, cv)
+    print(P)
+    plotTR2(P, cv)
+  Ps[[i]] = P
+}
+plot(1,1)
 sum(curvatures==0)/length(curvatures) #0.645 # 0.6653
 sum(curvatures==1)/length(curvatures) #0.282 # 0.246
 sum(curvatures==-1)/length(curvatures) #0.073 #0.0887
+sum(curvatures=="undefined")/length(curvatures) 
 # same proportions in [-1, 0] and [0,1]
+
+#0.71
+# 0.21
+# 0.08
 
 library(ape)
 library(adephylo)

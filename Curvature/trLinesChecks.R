@@ -60,12 +60,14 @@ a = runif(2, min = -1, max = 0)
 b = runif(2, min = -1, max = 0)
 c = runif(2, min = -1, max = 0)
 
+b = c(5,5)
+a = c(4,6)
 trLine = c()
 t = seq(0,1, length.out = 200)
 for (ti in t){
-  trLine = cbind(trLine, tropicalLine(c[-1],b[-1],ti))
+  trLine = rbind(trLine, tropicalLine(a,b,ti))
 }
-plot(trLine[1,], trLine[2,], type = 'l')
+plot(trLine[,1], trLine[,2], type = 'l')
 
 
 
@@ -101,9 +103,11 @@ trSegmentN <- function (u, v){
   return (TrSegment[-1,])
 }
 
-trSegment = trSegmentN(c,b)
-plot(trSegment[,2], trSegment[,3], type = 'l', col = 'red')
-points(a[2], a[3], phc = 16)
+trSegment = trSegmentN(c,a)
+lines(trSegment[,2], trSegment[,3], type = 'l', col = 'red')
+points(b[2], b[3], pch = 16)
+points(c[2], c[3], pch = 16)
+points(a[2], a[3], pch = 16)
 
 
 a = c(0.0000000 ,-0.4224496, -0.7683783)
@@ -112,6 +116,15 @@ c = c(0.0000000 ,-0.5606527, -0.7082600)
 dtr(c(-0.9718798,-0.5272726), c(-0.5606527, -0.7082600))
 dtr(c(0,-0.9718798,-0.5272726), c(0,-0.5606527, -0.7082600))
 
+round(trSegment[,2],7) == round(trLine[,1],7)
+round(trSegment[,3],7) == round(trLine[,2],7)
+
+round(distan2[,2], 8) == round(distan[,2],8)
+round(distan2[,1], 7) == round(distan[,1],7)
+distan[,1] >= distan[,2]
+
+dtr(c(-0.9718798,-0.1291668), a[-1])
+dtr(c(0,-0.9718798,-0.1291668), a)
 
 distN = c()
 for (i in 1:101){
