@@ -1,6 +1,6 @@
 
 
-dtr <- function (x, y){
+dtr2 <- function (x, y){
   x = c(0,x)
   y = c(0,y)
   return (max(x-y) - min(x-y))
@@ -65,7 +65,7 @@ tropicalLine <-  function (x,y, tk) {
 }
 
 distances <- function (x,y,z,x1,y1,c1){
-  t <- seq(0,1, length.out = 402)
+  t <- seq(0,1, length.out = 467)
   distan = matrix(NA, nrow = length(t),ncol = 2)
   if (x1[1]>=y1[1]) {
     a1 = y1
@@ -78,12 +78,12 @@ distances <- function (x,y,z,x1,y1,c1){
   EUsegment = c()
   for (i in 1:length(t)){
     tk = t[i]
-
+    
     muTR = tropicalLine (x,y,tk)
-
+    
     muE= (1-tk)*a1+b1*tk
     EUsegment = rbind(EUsegment, muE)
-    distan[i,] =  c( dtr(muTR, z), deu(muE, c1))
+    distan[i,] =  c( dtr2(muTR, z), deu(muE, c1))
   }
   distan = round(distan , 8)
   if ((distan[1,1] ==distan[length(t),2]) & (distan[1,2] ==distan[length(t),1])){
@@ -98,9 +98,9 @@ findEuclidean <- function (P){
   a = P[,1]
   b = P[,2]
   c = P[,3]
-  dab = dtr(a,b)
-  dbc = dtr(b,c)
-  dac = dtr(c,a)
+  dab = dtr2(a,b)
+  dbc = dtr2(b,c)
+  dac = dtr2(c,a)
   a1 = c(0,0)
   b1 = c(dab,0)
   xc = (dac^2-dbc^2+dab^2)/(2*dab)
@@ -178,180 +178,4 @@ plotTR2 <- function (P, cv){
   yl = c(min(distan[,2], distan[,1]), max(distan[,2], distan[,1]))
   plot(distan[,2], type = 'l', col = 'blue', main = 'a from b-c', ylim = yl)
   lines( distan[,1], type = 'l', col = 'red')
-}
-
-
-
-# skinny triangle
-a = c(1,3)
-b= c(0,0)
-c= c(3,2)
-
-
-# fat triangle
-a = c(0,2)
-b = c(1,0)
-c = c(3,3)
-
-#undefined on the paper
-# but it comes positive
-a = c(0,2)
-b = c(2,0)
-c = c(3,4)
-
-
-#fat
-a = c(0,4)
-b = c(3,0)
-c = c(5, 6)
-
-
-#skinny 
-a = c(0,0)
-b = c(2,4)
-c = c(5,1)
-
-#undefined
-a = c(0,0)
-b = c(448,449)
-c = c(452,256)
-
-# could there be 0 curved regions??
-a = c(0,0)
-b = c(1, 0)
-c = c(1,1)
-
-#P is the tropical triangle
-P<- matrix(c(a[-1],b[-1], c[-1]),ncol=length(a))
-P = matrix(c(a,b, c),nrow=length(a))
-curvature(P)
-
-
-P1 <- findEuclidean(P)
-a1 = P1[,1]
-b1= P1[, 2]
-c1 = P1[, 3]
-distan2 = distances (a[-1],b[-1],c[-1],P1[,1],P1[, 2],P1[, 3])
-t <- seq(0,1, length.out = 200)
-plot(t, distan2[,2], type = 'l')
-lines(t, distan2[,1], type = 'l')
-
-distan2 = distances (b[-1],c[-1],a[-1],P1[,2],P1[, 3],P1[, 1])
-t <- seq(0,1, length.out = 200)
-plot(t, distan2[,2], type = 'l')
-lines(t, distan2[,1], type = 'l')
-
-
-a = c(4,10)
-b = c(6,8)
-c = c( 7,5)
-distan2 = distances (b,c,a,P1[,2],P1[, 3],P1[, 1])
-#t <- seq(0,1, length.out = 200)
-plot(distan2[,2], type = 'l', col = 'red')
-lines(distan2[,1], type = 'l', col = 'blue')
-all(distan2[,1] >= distan2[,2])
-
-distan2 = distances (a,c,b,P1[,1],P1[, 3],P1[, 2])
-t <- seq(0,1, length.out = 200)
-plot( distan2[,2], type = 'l')
-lines( distan2[,1], type = 'l')
-
-plot(distan2[,1], type = 'l')
-lines(distan[,2], type = 'l', col = 'red' )
-
-c = c(8,7)
-b = c(8,2)
-trLine = c()
-t = seq(0,1, length.out = 200)
-for (ti in t){
-  trLine = rbind(trLine, tropicalLine(c,b,ti))
-}
-plot(trLine[,1], trLine[,2], type = 'l', col = 'red')
-
-
-
-
-set.seed(12346) # one type three classified wrong
-set.seed(123456) # 2 0 curved
-set.seed(1234567) 
-set.seed(333)
-curvatures = c()
-Ps= list()
-for (i in 1:1000){
-  #a = runif(2, min = 0, max = 10)
-  #b = runif(2, min = 0, max = 10)
-  #c = runif(2, min = 0, max = 10)
-  x = sample(1:10, size = 2, replace = TRUE)
-  y  = sample(c(1:10), size = 2, replace = TRUE)
-  z  = sample(c(1:10), size = 2, replace = TRUE)
-  while ((identical(x,y)) | (identical(x,z)) | (identical(z,y))){ 
-    x = c(0,sample(0:10, size = 2, replace = TRUE))
-    y = c(0,sample(c(0:10), size = 2, replace = TRUE))
-    z  = c(0,sample(c(0:10), size = 2, replace = TRUE))
-  }
-  P = matrix(c(x,y, z),nrow=length(x))
-  cv = curvature(P)
-  curvatures = c(curvatures, cv)
-    #print(P)
-    #plotTR2(P, cv)
-  #Ps[[i]] = P
-}
-plot(1,1)
-sum(curvatures==0)/length(curvatures) #0.645 # 0.6653
-sum(curvatures==1)/length(curvatures) #0.282 # 0.246
-sum(curvatures==-1)/length(curvatures) #0.073 #0.0887
-sum(curvatures=="undefined")/length(curvatures) 
-# same proportions in [-1, 0] and [0,1]
-
-#0.71
-# 0.21
-# 0.08
-
-library(ape)
-library(adephylo)
-# non ultrametric
-Tr = rtree(3, br = runif, min = 0, max = 2)
-# ultrametric
-Tr_ultra=as.phylo(as.hclust(chronos(Tr, lambda=0) ))
-plot(Tr, type = "cladogram",label.offset = 0.05)
-nodelabels()
-tiplabels()
-length(Tr$edge.length)
-dists = distTips(Tr_ultra, tips = "all", method = "patristic", useC = TRUE)
-
-
-projTroursPt <- function (leaves, ultra = F){
-  Tr = rtree(leaves)
-  if (ultra) Tr = as.phylo(as.hclust(chronos(Tr, lambda=0) ))
-  Trd = distTips(Tr, tips = "all", method = "patristic", useC = TRUE)
-  pt = Trd - Trd[1]
-  return( pt[-1])
-}
-curvatures = c()
-for (i in 1:100){
-  isTriangle = F
-  while(isTriangle != TRUE){
-    a = projTroursPt(3, F)
-    b = projTroursPt(3, F)
-    c = projTroursPt(3, F)
-    if ((identical(a,b) == F) & (identical(a,c) == FALSE) & (identical(b,c) == FALSE)) isTriangle = TRUE
-  }
-  P = matrix(c(a,b, c),nrow=length(a))
-  curvatures = c(curvatures, curvature(P))
-}
-sum(curvatures==0)/length(curvatures) # 0.675
-sum(curvatures==1)/length(curvatures) # 0.211
-sum(curvatures==-1)/length(curvatures) # 0.114
-
-
-for (i in 1:100){
-  isTriangle = F
-  while(isTriangle != TRUE){
-    a = projTroursPt(4, T)
-    b = projTroursPt(4, T)
-    c = projTroursPt(4, T)
-    if ((identical(a,b) == F) & (identical(a,c) == FALSE) & (identical(b,c) == FALSE)) isTriangle = TRUE
-  }
-  P = matrix(c(a,b, c),nrow=length(a))
-  #curvatures = c(curvatures, curvature(P))
 }

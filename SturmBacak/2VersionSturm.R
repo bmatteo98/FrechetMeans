@@ -98,69 +98,6 @@ tropicalLine <-  function (x,y, tk) {
   return (mu)
 }
 
-# no
-inductive_mean <- function (x,y,k) {
-  if (identical(x,y)) {
-    return (x)
-    break
-  }
-  if ((x[1] == y[1]) | (x[2] == y[2])) {
-    return ((1-1/k)*x+y/k)
-    break
-  }
-  if ((x[2] == y[1]) | (x[1] == y[2])) {
-    return ((1-1/k)*x+y/k)
-    break
-  }
-  
-  if ((x[1] == x[2]) & (y[1] == y[2])){
-    return ((1-1/k)*x+y/k)
-    break
-  }
-  
-  if (x[1]<y[1]) {
-    a = x
-    b = y
-  }
-  if (x[1]>y[1]) {
-    a = y
-    b = x
-  }
-  if ((a[2]<b[2]) & ((a[1]-a[2])<=(b[1]-b[2]))){
-    t = (b[2]-a[2])/(b[1]-a[1])
-    if ((1/k) <= t) {
-      mu = c(a[1]+(1/k)*(b[1]-a[1]), a[2]+(1/k)*(b[1]-a[1]))
-    }
-    if (t < (1/k)) {
-      mu = c(a[1]+(1/k)*(b[1]-a[1]), b[2])
-
-    }
-  }
-  
-  if ((a[2]<b[2]) & ((a[1]-a[2])>(b[1]-b[2]))){
-    t = (b[1]-a[1])/(b[2]-a[2])
-    if (t >= (1/k)) {
-      mu = c(a[1]+(1/k)*(b[2]-a[2]), a[2]+(1/k)*(b[2]-a[2]))
-    }
-    if (t < (1/k)) {
-      mu = c(b[1],a[2]+(1/k)*(b[2]-a[2]))
-
-    }
-  }
-  
-  if (a[2]>b[2]){
-    t = (a[2]-b[2])/(a[2]-b[2]+b[1]-a[1])
-    if (t >= (1/k)) {
-      mu = c(a[1],a[2]-(1/k)*(a[2]-b[2]+b[1]-a[1]))
-    }
-    if (t < (1/k)) {
-      mu = c(a[1]+b[2]-a[2]+(1/k)*(a[2]-b[2]+b[1]-a[1]),b[2])
-    }
-  }
-  return (mu)
-}
-
-#inductive_mean(c(0,0), c(2,7), 3)
 
 FrechetStrum <- function (P, K, N, epsilon){
   mu = P[,sample(ncol(P),size=1)]
@@ -170,7 +107,6 @@ FrechetStrum <- function (P, K, N, epsilon){
     muk=mu
     tk = 1/(k+1)
     mu = tropicalLine(muk, p, tk )
-    #mu = inductive_mean(muk, p, k+1 )
     d = c(d, deu(muk, mu))
     ld = length(d)
     if (ld>N){
