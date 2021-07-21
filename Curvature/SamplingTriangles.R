@@ -1,3 +1,8 @@
+# sampling triangles with random coordinates, integer coordinates and also triangles
+# from both the tree space and ultrametric tree space
+# computing the curvature and comparing results of curvatureND and curvature2D 
+# which should give the same result on R^3/R1
+
 # random coordinates
 
 curvatures = c()
@@ -75,17 +80,18 @@ sum(curvaturesN=="undefined")/length(curvaturesN)
 
 library(ape)
 library(adephylo)
+Tr = rtree(leaves)
+Tr = as.phylo(as.hclust(chronos(Tr, lambda=0, quiet=TRUE) ))
 
 projTroursPt <- function (leaves, ultra = F){
   Tr = rtree(leaves)
   if (ultra) Tr = as.phylo(as.hclust(chronos(Tr, lambda=0, quiet=TRUE) ))
   Trd = distTips(Tr, tips = "all", method = "patristic", useC = TRUE)
-  pt = Trd - Trd[1]
-  return( pt)
+  return( Trd)
 }
 
 curvatures = c()
-for (i in 1:100){
+for (i in 1:10){
   a = round(as.numeric(projTroursPt(4, T)), 8)
   b = round(as.numeric(projTroursPt(4, T)), 8)
   c = round(as.numeric(projTroursPt(4, T)), 8)
@@ -94,10 +100,10 @@ for (i in 1:100){
     b = round(as.numeric(projTroursPt(4, T)), 8)
     c = round(as.numeric(projTroursPt(4, T)), 8)
   }
-  #print(a)
-  #print(b)
-  #print(c)
+
   P = matrix(c(a,b, c),nrow=length(a))
+  print(P)
+  #plotDistanN(P)
   curvatures = c(curvatures, curvatureN(P))
 }
 sum(curvatures==0)/length(curvatures) 

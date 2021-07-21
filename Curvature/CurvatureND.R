@@ -1,3 +1,6 @@
+# This code computes the curvature of a tropical triangle with N-dimensional coordinates
+
+
 dtr <- function (x, y) return (max(x-y) - min(x-y))
 deu <- function (x, y) return (sqrt(sum((x-y)^2)))
 
@@ -112,6 +115,21 @@ plotTRN <- function (P,cv){
   points(b[2], b[3], pch = 16)
   points(c[2], c[3], pch = 16)
   points(a[2], a[3], pch = 16)
+  distan = distancesN (a,b,c)
+  plot(distan[,2], type = 'l', col = 'blue', main = 'c from a-b')
+  lines( distan[,1], type = 'l', col = 'red')
+  distan = distancesN (a,c,b)
+  plot(distan[,2], type = 'l', col = 'blue', main = 'b from a-c')
+  lines( distan[,1], type = 'l', col = 'red')
+  distan = distancesN (b,c,a)
+  plot(distan[,2], type = 'l', col = 'blue', main = 'a from b-c')
+  lines( distan[,1], type = 'l', col = 'red')
+}
+plotDistanN <- function (P){
+  a = P[,1]
+  b = P[,2]
+  c = P[,3]
+  par(mfrow=c(1,3))
   distan = distancesN (a,b,c)
   plot(distan[,2], type = 'l', col = 'blue', main = 'c from a-b')
   lines( distan[,1], type = 'l', col = 'red')

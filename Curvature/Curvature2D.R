@@ -1,4 +1,5 @@
-
+# This code computes the curvature of a tropical triangle with bidimensional coordinates
+# in the tropical projective torus R^3/R1
 
 dtr2 <- function (x, y){
   x = c(0,x)
@@ -179,3 +180,4 @@ plotTR2 <- function (P, cv){
   plot(distan[,2], type = 'l', col = 'blue', main = 'a from b-c', ylim = yl)
   lines( distan[,1], type = 'l', col = 'red')
 }
+

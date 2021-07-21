@@ -1,4 +1,5 @@
-
+# This code implements Sturm's algorithm for sets of bidimensional points in the 
+# tropical metric space
 a = c(0,0)
 b = c(2,4)
 c = c(5,1)
