@@ -20,4 +20,5 @@
   ## samplingTypes:
      Sampling type 1 and type 5 triangles with bidimensional coordinates and compute the curvature.
 
-# 
+# Bo'sCode:
+We translate the code provided by Bo Lin to compute Fréchet means of a given set of points in tropical metric space into R.
