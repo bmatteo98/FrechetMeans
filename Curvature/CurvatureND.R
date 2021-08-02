@@ -21,10 +21,12 @@ trSegmentN <- function (u, v){
   a = 0
   TrSegment = c()
   for (j in 1:(N-1)){
+    byt = 0.001
     y1 = L[j,]
     y2 = L[j+1,]
     b = a+dtr(y1, y2)
-    t = seq(a,b,by=0.001)
+    if (dtr(y1,y2) < byt) byt = dtr(y1,y2)/2
+    t = seq(a,b,byt)
     t = t[-length(t)]
     segment = c()
     if (a == b) a = b
@@ -40,7 +42,6 @@ trSegmentN <- function (u, v){
   TrSegment = rbind(TrSegment, u)
   return (TrSegment)
 }
-
 
 
 

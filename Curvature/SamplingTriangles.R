@@ -7,7 +7,7 @@
 
 curvatures = c()
 curvaturesN = c()
-for (i in 1:10){
+for (i in 1:100){
   x= runif(2, min = 0, max = 10)
   y= runif(2, min = 0, max = 10)
   z= runif(2, min = 0, max = 10)

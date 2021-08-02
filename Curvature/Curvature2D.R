@@ -152,7 +152,7 @@ plotTR2 <- function (P, cv){
     trLine = rbind(trLine, tropicalLine(x,y,ti))
   }
   par(mfrow=c(2,2), mar = rep(2, 4))
-  plot(trLine[,1], trLine[,2], type = 'l', col = 'red', xlim = xl, ylim = yl, main = paste(cv, "2-dim"))
+  plot(trLine[,1], trLine[,2], type = 'l', col = 'red', xlim = xl, ylim = yl, main = paste("Curvature: ",cv))
   trLine = c()
   for (ti in t){
     trLine = rbind(trLine, tropicalLine(y,z,ti))
@@ -169,15 +169,22 @@ plotTR2 <- function (P, cv){
   P1 = findEuclidean(P)
   distan = distances (x,y,z,P1[,1],P1[,2],P1[, 3])
   yl = c(min(distan[,2], distan[,1]), max(distan[,2], distan[,1]))
-  plot(distan[,2], type = 'l', col = 'blue', main = 'c from a-b', ylim = yl)
-  lines( distan[,1], type = 'l', col = 'red')
+  plot(distan[,2], type = 'l', col = 'purple', main = 'Distances from C to AB', ylim = yl)
+  lines( distan[,1], type = 'l', col = 'orange')
+  
+  legend(1, 11, legend=c("Tropical", "Euclidean"),
+         col=c("orange", "purple"), lty=c(1,1))
   distan = distances (x,z,y,P1[,1],P1[,3],P1[,2])
   yl = c(min(distan[,2], distan[,1]), max(distan[,2], distan[,1]))
-  plot(distan[,2], type = 'l', col = 'blue', main = 'b from a-c', ylim = yl)
-  lines( distan[,1], type = 'l', col = 'red')
+  plot(distan[,2], type = 'l', col = 'purple', main = 'Distances from B to AC', ylim = yl)
+  lines( distan[,1], type = 'l', col = 'orange')
   distan = distances (y,z,x,P1[,2],P1[,3],P1[,1])
   yl = c(min(distan[,2], distan[,1]), max(distan[,2], distan[,1]))
-  plot(distan[,2], type = 'l', col = 'blue', main = 'a from b-c', ylim = yl)
-  lines( distan[,1], type = 'l', col = 'red')
+  plot(distan[,2], type = 'l', col = 'purple', main = 'Distances from A to BC', ylim = yl)
+  lines( distan[,1], type = 'l', col = 'orange')
 }
 
+x = c(10,2)    
+y = c(6,9)  
+z = c(5,0)
+cv = -1
