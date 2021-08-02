@@ -1,4 +1,5 @@
 # Curvature:
+We investigate the curvature of the tropical metric space.
   ## Curvature2D: 
     This code computes the curvature of a tropical triangle with bidimensional coordinates in the tropical projective torus R^3/R1.
     
@@ -22,3 +23,6 @@
 
 # Bo'sCode:
 We translate the code provided by Bo Lin to compute Fréchet means of a given set of points in tropical metric space into R.
+
+# SturmBacak:
+We implement Sturm's and Bacak's algorithms to show that the do not converge in the tropical metric space.
