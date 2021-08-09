@@ -20,12 +20,10 @@ is_2 = function (a,b,c){
   six = ((a[1]<=b[1]) & (b[1]<=c[1]) & (a[2] <= c[2]) & (c[2]<= b[2]) & (b[2]-b[1] >= a[2]-a[1]) & (c[2]-c[1] >= a[2]-a[1]))
   two = ((a[1]<=b[1]) & (b[1]<=c[1]) & (b[2] >= a[2]) & (a[2]>= c[2])& (b[2]-a[2] >= b[1]-a[1]))
   three = ((a[1]<=b[1]) & (b[1]<=c[1]) & (a[2] >= c[2]) & (c[2]>= b[2])& (c[2]-b[2] <= c[1]-b[1]))
-  four = FALSE
-  #four = ((a[1]<=b[1]) & (b[1]<=c[1]) & (b[2] <= a[2]) & (a[2] <= c[2])  & (c[2]-b[2] <= c[1]-b[1]))
   five = ((a[1]<=b[1]) & (b[1]<=c[1]) & (a[2] <= b[2]) & (b[2] <= c[2]) & (c[2]-b[2] >= c[1]-b[1]) & (b[2]-a[2] >= b[1]-a[1]))
   seven =  ((a[1]<=b[1]) & (b[1]<=c[1]) & (a[2] <= b[2]) & (b[2] <= c[2]) & (c[2]-b[2] >= c[1]-b[1]) & (b[1]-a[1] >= b[2]-a[2]))
   
-  return (one | two | three | four | five | six | seven)
+  return (one | two | three |  five | six | seven)
 }
 
 is_4 = function (a,b,c){
@@ -33,11 +31,9 @@ is_4 = function (a,b,c){
   six = ((a[1]<=b[1]) & (b[1]<=c[1]) & (b[2] <= a[2]) & (a[2]<= c[2]) & (a[1]-a[2] >= c[1]-c[2]))
   two = ((a[1]<=b[1]) & (b[1]<=c[1]) & (b[2] >= a[2]) & (a[2]>= c[2]) & (b[2]-a[2] <= b[1]-a[1]))
   three = ((a[1]<=b[1]) & (b[1]<=c[1]) & (a[2] >= c[2]) & (c[2]>= b[2])& (c[2]-b[2] >= c[1]-b[1]))
-  #four = ((a[1]<=b[1]) & (b[1]<=c[1]) & (b[2] <= a[2]) & (a[2] <= c[2])  & (c[2]-b[2] >= c[1]-b[1]) & ())
-  four = FALSE
   five = ((a[1]<=b[1]) & (b[1]<=c[1]) & (a[2] <= b[2]) & (b[2] <= c[2]) & (c[2]-b[2] <= c[1]-b[1]) & (b[2]-a[2] >= b[1]-a[1]))
   seven = ((a[1]<=b[1]) & (b[1]<=c[1]) & (a[2] <= b[2]) & (b[2] <= c[2]) & (c[2]-b[2] >= c[1]-b[1]) & (c[1]-a[1] >= c[2]-a[2]))
-  return (one | two | three | four | five | six | seven)
+  return (one | two | three | five | six | seven)
 }
 
 which_type = function (a,b,c){
@@ -111,8 +107,9 @@ for (j in 1:10){
   plotTYPE(x,y,z)
 }
 
+set.seed(110898)
 types = c()
-for (j in 1:1000){
+for (j in 1:100){
   x= runif(2, min = 0, max = 10)
   y= runif(2, min = 0, max = 10)
   z= runif(2, min = 0, max = 10)

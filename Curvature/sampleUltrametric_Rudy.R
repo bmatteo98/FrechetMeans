@@ -25,9 +25,9 @@ generateUltra <- function(split) {
 }
 
 D = generateUltra(1)
-
+set.seed(110898)
 curvatures = c()
-for (i in 1:1000){
+for (i in 1:100){
   a = D[sample(1:nrow(D), size = 1),]
   b = D[sample(1:nrow(D), size = 1),]
   c = D[sample(1:nrow(D), size = 1),]
