@@ -320,21 +320,6 @@ OneFrechet <- function (pt, P, height){
 }
 
 
-sp2 = cbind(c(1/5, 2/5, 2, 2/5, 2, 2), c(2, 2, 2, 2/5, 2/5, 1/5), c(2/5, 2/5, 2, 1/5, 2, 2))
-current= OneFrechet(c(0,0,0,0,0,0), sp2, 2)
-
-sp1 = cbind(c(9/100, 19/50, 19/50, 1, 19/50, 19/50, 1, 19/50, 1, 1), c(1, 1, 1, 1, 21/100, 57/100, 61/100, 57/100, 61/100, 61/100), c(31/50, 1, 49/50, 49/50, 1, 49/50, 49/50, 1, 1, 63/100), c(1, 1, 1, 47/100, 7/50, 4/5, 1, 4/5, 1, 1))
-current= OneFrechet(c(0,0,0,0,0,0, 0, 0, 0, 0), sp1, 2)
-
-
-skinny = cbind(c(0,0,0), c(0,2,4), c(0,5,1))
-OneFrechet(c(0,0,0), skinny, 2)
-
-fat = cbind(c(0,0,4), c(0,3,0), c(0,5,6))
-OneFrechet(c(0,0,0), fat, 4)
-
-undefined = cbind(c(0,0,0), c(0,448,449), c(0,452,256))
-OneFrechet(c(0,0,0), undefined, 256)
 
 
 FlatPerturb <- function (p1, p2, incr, decr) {
@@ -514,6 +499,13 @@ FMPolytope <- function (p, P, height){
   return (list(minsum, length(vertices), vertices))
 }
 
+Frechet <- function (P, heigth){
+  n = length(p)
+  pt = OneFrechet(rep(heigth, n), P, heigth)
+  if (IsFrechet(pt, P)==FALSE) return("Could not find one Frechet Mean")
+  else (return (list (pt, FMPolytope(pt, P, heigth))))
+}
+
 p = c(1/5, 2/5, 2, 2/5, 2, 2)
 sp2 = cbind(c(1/5, 2/5, 2, 2/5, 2, 2), c(2, 2, 2, 2/5, 2/5, 1/5), c(2/5, 2/5, 2, 1/5, 2, 2))
 FMPolytope(p, sp2, 2)
@@ -521,17 +513,25 @@ FMPolytope(p, sp2, 2)
 sp1 = cbind(c(9/100, 19/50, 19/50, 1, 19/50, 19/50, 1, 19/50, 1, 1), c(1, 1, 1, 1, 21/100, 57/100, 61/100, 57/100, 61/100, 61/100), c(31/50, 1, 49/50, 49/50, 1, 49/50, 49/50, 1, 1, 63/100), c(1, 1, 1, 47/100, 7/50, 4/5, 1, 4/5, 1, 1))
 p = c(48/25, 48/25, 48/25, 193/100, 8/5, 43/25, 2, 43/25, 2, 193/100)
 fmp = FMPolytope(p, sp1, 2)
-
-
-Frechet <- function (P, heigth){
-  n = length(p)
-  pt = OneFrechet(rep(heigth, n), P, heigth)
-  if (IsFrechet(pt, P)==FALSE) return("Could not find one Frechet Mean")
-  else (return (list (pt, FMPolytope(pt, P, heigth))))
-}
   
   
 FMsp1 = Frechet(sp1, 2)
 FMsp2 =Frechet(sp2, 2)
   
+
+sp2 = cbind(c(1/5, 2/5, 2, 2/5, 2, 2), c(2, 2, 2, 2/5, 2/5, 1/5), c(2/5, 2/5, 2, 1/5, 2, 2))
+current= OneFrechet(c(0,0,0,0,0,0), sp2, 2)
+
+sp1 = cbind(c(9/100, 19/50, 19/50, 1, 19/50, 19/50, 1, 19/50, 1, 1), c(1, 1, 1, 1, 21/100, 57/100, 61/100, 57/100, 61/100, 61/100), c(31/50, 1, 49/50, 49/50, 1, 49/50, 49/50, 1, 1, 63/100), c(1, 1, 1, 47/100, 7/50, 4/5, 1, 4/5, 1, 1))
+current= OneFrechet(c(0,0,0,0,0,0, 0, 0, 0, 0), sp1, 2)
+
+
+skinny = cbind(c(0,0,0), c(0,2,4), c(0,5,1))
+OneFrechet(c(0,0,0), skinny, 2)
+
+fat = cbind(c(0,0,4), c(0,3,0), c(0,5,6))
+OneFrechet(c(0,0,0), fat, 4)
+
+undefined = cbind(c(0,0,0), c(0,448,449), c(0,452,256))
+OneFrechet(c(0,0,0), undefined, 256)
   
