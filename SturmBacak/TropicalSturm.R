@@ -112,14 +112,14 @@ FrechetStrum <- function (P, K, N, epsilon){
     ld = length(d)
     if (ld>N){
       if (all(d[c((ld-N):ld )]<epsilon) ) {
-        return (c(mu, sosd(dtr, mu, P)))
+        return (c(mu, sosd(dtr, mu, P), k))
       }
     }
   }
   crit = 0
   return (c("out for iterations:", mu))
 }
-
+set.seed(110898)
 FrechetStrum(P, K, N, epsilon)
 
 frMeans <- matrix(NA, nrow = 50, ncol = 3)
@@ -131,8 +131,11 @@ plot(c(0, 2, 5),c(0, 4, 1), pch = 16)
 lines (c(0,2), c(0,2))
 lines(c(1,5), c(1,1))
 lines (c(2,2), c(1,4))
-points(frMeans[,1], frMeans[,2], col='magenta', type='p',pch=16, ylim=c(-1,4), xlim= c(-1,5))
+#points(frMeans[,1], frMeans[,2], col='magenta', type='p',pch=16, ylim=c(-1,4), xlim= c(-1,5))
 points(2,1, col='green', pch = 16)
+points(2,1)
+points( 0.7770935 , 0.7770935, col='red', pch = 16)
+points(0.7770935 , 0.7770935)
 
 plot(c(0, 3, 5),c(4, 0, 6), pch = 16)
 lines(c(0,0), c(4,0))
@@ -143,4 +146,6 @@ lines(c(2,5), c(6,6))
 lines(c(2,0) ,c(6,4))
 points(frMeans[,1], frMeans[,2], col='magenta', type='p',pch=16, ylim=c(-1,4), xlim= c(-1,5))
 points(3,4, col='green', pch = 16)
-
+points(3,4)
+points( 0.000000 ,    3.999305 , col='red', pch = 16)
+points(0.000000 ,    3.999305 )

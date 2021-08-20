@@ -124,7 +124,7 @@ FrechetBacak<- function (P, K, N, epsilon){
     if (ld>N){
       if (all(d[c((ld-N):ld )]<epsilon) ) {
         #return (c(mu,1, k, sosd(dtr, mu, P)))
-        return (c(mu, sosd(dtr, mu, P)))
+        return (c(mu, sosd(dtr, mu, P), k))
         }
     }
   }
@@ -132,7 +132,7 @@ FrechetBacak<- function (P, K, N, epsilon){
   return (c(mu, crit))
   #return (c(muk,crit))
   }
-
+set.seed(110898)
 FrechetBacak (P, K, N, epsilon)
 
 frMeans <- matrix(NA, nrow = 1000, ncol = 3)
