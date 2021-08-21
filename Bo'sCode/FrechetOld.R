@@ -4,10 +4,9 @@ library(rSymPy)  # solve derivative = 0
 library(rje) # powerset
 
 Peakpairs <- function (l1,l2){ # l1, l2 are vectors
-
   n <- length(l1)
   if (n != length(l2)) return ("unequal length of lists")
-  diff = round(l1-l2, 7)
+  diff = round(l1-l2, 3)
   maxim = max(diff)
   minim = min(diff)
   i = which((diff) == maxim)
@@ -20,7 +19,6 @@ IsFrechet <- function (p, L) {# L is a matrix, p is a vector
   m = ncol(L)
   n = length(p)
   allpeaks = Peakpairs(p, L[,1])
-
   allpeaks = cbind(rep(1, nrow(allpeaks)), allpeaks)
   for (i in 2:m){
     pp = Peakpairs(p, L[,i])
@@ -34,6 +32,7 @@ IsFrechet <- function (p, L) {# L is a matrix, p is a vector
     peack = allpeaks[j,]
     S[peack[2], j] = p[peack[2]] - p[peack[3]] + L[ peack[3], peack[1]] - L[ peack[2], peack[1]]
     S[peack[3], j] = p[peack[3]] - p[peack[2]] + L[ peack[2], peack[1]] - L[peack[3], peack[1]]
+    #print(S)
   }
   w = matrix(0, nrow = m, ncol = nrow(allpeaks))
   for (i in 1:m){
@@ -53,7 +52,7 @@ NormalVec <-function (p,height) p-max(p)+height
 Infor <- function (l1,l2, pv){ # l1, l2 are vectors
   n <- length(l1)
   if (n != length(l2)) return ("unequal length of lists")
-  dif = round(l1-l2, 7)
+  dif = round(l1-l2, 4)
   maxim = max(dif)
   minim = min(dif)
   i = c()
@@ -176,33 +175,6 @@ EquivClass<- function(L, P, w){ # L contains on the columns
 }
 
 
-solve_linSys = function(equations, n){
-  equations_sp =str_split(equations, ',', simplify = TRUE)
-  equations_sp = equations_sp[-length(equations_sp)]
-  b = c()
-  A = matrix(NA, ncol = n, nrow = n+1)
-  for (k in 1:length(equations_sp)){
-    Arow= rep(0, n)
-    eqn = str_split(equations_sp[k], ' ', simplify = TRUE)
-    if (eqn[1]=='') eqn = eqn[-1]
-    b = c(b,as.numeric(eqn[1]))
-    eqn = eqn[-1]
-    len = length(eqn)
-    for(j in c(1:len)[which(c(1:len)%%2==1)]){
-        s = eqn[j]
-        coef=as.numeric(str_split(eqn[j+1], '\\*z', simplify = TRUE))
-        if(s=='-') coef[1] = -as.numeric(coef[1])
-        Arow[coef[2]]=coef[1]
-    }
-    A[k,]=Arow
-  }
-  A[n+1,]=c(1, rep(0,n-1))
-  b = c(b,0)
-  sol = qr.solve(A,b)
-  return(qr.solve(A,b))
-}
-
-
 MinQuad <- function (f, n){ 
   l = ""
   z = ""
@@ -219,8 +191,11 @@ MinQuad <- function (f, n){
     fzi = sympy( paste0("fzi=simplify(",fzi, ")" ))
     l = paste0(l,fzi,  ",")
   }
-  return(solve_linSys(l,n))
-  }
+  l = paste0(l, "z1")
+  sympy (paste0("l = [", l, "]"))
+  sympy (paste0("z = (", z, ")"))
+  solution = sympy("sol = solve(l, z)")
+  return(solution)}
 
 
 unstring <- function (sol, n){
@@ -233,15 +208,12 @@ unstring <- function (sol, n){
   sol [1] = 0
   return (sol)
 }
-#sp = cbind(c(0.5728785, 0.2728091, 0.4413004, 0.2295364), c(0.1836524, 0.7959483, 0.6738594, 0.3249388), 
-#           c(0.6511608, 0.3831167, 0.2707911, 0.7689323), c(0.7428415, 0.6889907, 0.4957099, 0.9150619))
-#p = c(1.887674, 1.935709, 1.823384, 2.000000)
-#infos=Infos(p,sp)
-Cand <- function (newpt, P, height){
 
+
+Cand <- function (newpt, P, height){
   m = ncol(P)
   n = nrow(P)
-  infos = Infos(round(newpt,6),round(P, 6))
+  infos = Infos(newpt,sp2)
   if (length(infos) !=2*m) return ("error, lengths do not match")
   ec = EquivClass(infos, P, rep(0, n))
   atlas = ec[[2]]
@@ -252,7 +224,6 @@ Cand <- function (newpt, P, height){
       atlas [[ind]] = paste0("z", i,  "+",  as.character(atlas [[ind]])) 
     }
   }
-
   obj = ""
   for (i in 1:m){
     indp = sort(infos[[2*i-1]][[1]])[1] 
@@ -261,8 +232,7 @@ Cand <- function (newpt, P, height){
     if (i !=m) obj = paste0(obj, "+")
   }
   sol = MinQuad(obj,length(ec[[1]]) ) 
-  #sol = unstring (sol, length(ec[[1]]))
-
+  sol = unstring (sol, length(ec[[1]]))
   atl = ec[[2]]
   for (i in 1:length(ec[[1]])){
     for (ind in ec[[1]][[i]][[1]]){
@@ -329,8 +299,8 @@ OneFrechet <- function (pt, P, height){
     c = c+1
     if (all(current == newpt)) {status = TRUE}
     else if (identical (Infos(newpt, P), Infos(current, P))){
-      #return (list(Infos(newpt, P), Infos(current, P)))
-      cand = Cand (newpt, P, height)
+      return (list(Infos(newpt, P), Infos(current, P)))
+      cand = Cand (infosNewpt, P, height)
       if (IsFrechet(cand, P)) {
         status = TRUE
         current = cand
@@ -341,7 +311,6 @@ OneFrechet <- function (pt, P, height){
       }
     }
     else {
-  
       status = IsFrechet(newpt, P)
       current = newpt
     }
@@ -379,7 +348,7 @@ FlatPerturb <- function (p1, p2, incr, decr) {
   }
   if (length(bounds) == 0) {dist = 0}
   else {dist = min(bounds)}
-
+  #print(bounds)
   return (c(dist, ep, ev))
 }
 #FlatPerturb(c(0, 0, 0, 0, 2, 0.4), c(1/5, 2/5, 2, 2/5, 2, 2), c(1, 2, 3, 5, 6), c())
@@ -505,14 +474,14 @@ FMPolytope <- function (p, P, height){
   current =list(pnormal)
   nextround = list(1)
   while (length(nextround) != 0){
-
+    #print(nextround)
     nextround = list()
     for (pt in current){
       flats = FlatDirs(pt, P)
       candidates = flats[[1]]
       if (length(candidates) == 0) return(list(minsum, length(vertices), vertices))
       dists = unlist(flats[[2]])
-
+      #print(length(candidates))
       for (index in 1:length(candidates)){
         candidate = candidates [[index]]
         dist = dists [index]
@@ -533,10 +502,10 @@ FMPolytope <- function (p, P, height){
 Frechet <- function (P, heigth){
   n = nrow(P)
   pt = OneFrechet(rep(heigth, n), P, heigth)
-
   if (IsFrechet(pt, P)==FALSE) return("Could not find one Frechet Mean")
   else (return (list (pt, FMPolytope(pt, P, heigth))))
 }
+
 
 
 
@@ -567,47 +536,12 @@ p = c(1/5, 2/5, 2, 2/5, 2, 2)
 sp2 = cbind(c(1/5, 2/5, 2, 2/5, 2, 2), c(2, 2, 2, 2/5, 2/5, 1/5), c(2/5, 2/5, 2, 1/5, 2, 2))
 FMPolytope(p, sp2, 2)
 
-sp1 = cbind(c(9/100, 19/50, 19/50, 1, 19/50, 19/50, 1, 19/50, 1, 1, 49/50, 17/50, 1 , 49/100, 57/100),
-            c(1, 1, 1, 1, 21/100, 57/100, 61/100, 57/100, 61/100, 61/100,1 ,49/50, 61/100, 57/100 , 1),
-            c(31/50, 1, 49/50, 49/50, 1, 49/50, 49/50, 1, 1, 63/100, 61/100, 19/50, 1, 4/5, 49/50), 
-            c(1, 1, 1, 47/100, 7/50, 4/5, 1, 4/5, 1, 1, 49/50, 57/100, 31/50,61/100, 19/50 ))
-
+sp1 = cbind(c(9/100, 19/50, 19/50, 1, 19/50, 19/50, 1, 19/50, 1, 1), c(1, 1, 1, 1, 21/100, 57/100, 61/100, 57/100, 61/100, 61/100), c(31/50, 1, 49/50, 49/50, 1, 49/50, 49/50, 1, 1, 63/100), c(1, 1, 1, 47/100, 7/50, 4/5, 1, 4/5, 1, 1))
 p = c(48/25, 48/25, 48/25, 193/100, 8/5, 43/25, 2, 43/25, 2, 193/100)
 fmp = FMPolytope(p, sp1, 2)
 
-sp3 = cbind(c(0,0,0), c(0,2,4), c(0,1,3), c(0,5,1))
-plot(c(0, 2, 5, 1,  2),c(0, 4, 1, 3,  2), pch = 16, col = c('black', 'black', 'black', 'black', 'red'))
-
+  
 FMsp1 = Frechet(sp1, 2)
 FMsp2 =Frechet(sp2, 2)
 FMskinny = Frechet(skinny, 2)
-FMsp3 =Frechet(fat, 4)
-
-a = c(0,0,0)
-b = c(0,448,449)
-c = c(0,452,256)
-undefined = cbind(a,b,c)
-FMsp3 =Frechet(undefined, 256)
-
-set.seed(110898)
-times = c()
-for (n in 2:10){
-  print(n)
-  tic = Sys.time()
-  P = matrix(runif(4*n), nrow = n)
-  Frechet(P,2)
-  toc = Sys.time()
-  times = c(times, toc-tic)
-}
-times = c(0.7184191,  0.2761981  ,0.5801570  ,0.3149991,  0.4561300  ,0.7781529  ,2.6835811, 45.7300069,  6.3897410*60)
-par(mar=c(5,6,4,1)+.1)
-plot(2:10, times, type = 'b',  lty = 2, col = 'blue', pch = 16, xaxt="n", yaxt="n",ylab = ' ', xlab= ' ')
-axis(1,   at = seq(2, 10, by = 1), las=2)
-axis(2, at = c(seq(0, 400, by = 50), times), las=2)
-
-library(ggplot2)
-df = as.data.frame(cbind(2:10, times ))
-ggplot(data=df, aes(x=V1, y=times, group=1)) +
-  geom_line(linetype = "dashed", col= 'blue')+
-  geom_point(col = 'blue') + scale_y_continuous(breaks=c(seq(0,400,50), times[9]))+ scale_x_continuous(breaks=seq(2,10,1))
-
+  
