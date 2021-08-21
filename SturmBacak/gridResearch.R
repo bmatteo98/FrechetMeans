@@ -119,6 +119,7 @@ lines(c(448, 448), c(256, 449))
 lines(c(449, 448), c(449, 449))
 lines(c(0, 449), c(0, 449))
 lines(c(256, 452), c(256, 256))
+points(256, 256)
 points(s[mins[,1]], s[mins[,2]], type='p',pch=16,  col = 'green')
 
 

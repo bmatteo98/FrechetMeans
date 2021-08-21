@@ -4,6 +4,8 @@ library(rSymPy)  # solve derivative = 0
 library(rje) # powerset
 
 Peakpairs <- function (l1,l2){ # l1, l2 are vectors
+  print(l1)
+  print(l2)
   n <- length(l1)
   if (n != length(l2)) return ("unequal length of lists")
   diff = round(l1-l2, 3)
@@ -19,6 +21,10 @@ IsFrechet <- function (p, L) {# L is a matrix, p is a vector
   m = ncol(L)
   n = length(p)
   allpeaks = Peakpairs(p, L[,1])
+  # print('p')
+  # print(p)
+  # print('L[1]')
+  # print(L[,1])
   allpeaks = cbind(rep(1, nrow(allpeaks)), allpeaks)
   for (i in 2:m){
     pp = Peakpairs(p, L[,i])
@@ -213,7 +219,7 @@ unstring <- function (sol, n){
 Cand <- function (newpt, P, height){
   m = ncol(P)
   n = nrow(P)
-  infos = Infos(newpt,sp2)
+  infos = Infos(newpt,P)
   if (length(infos) !=2*m) return ("error, lengths do not match")
   ec = EquivClass(infos, P, rep(0, n))
   atlas = ec[[2]]
@@ -254,6 +260,7 @@ ssq <- function (pt , P) {
 }
 
 OneFrechet <- function (pt, P, height){
+  #print('here6')
   if (IsFrechet(pt, P)) return (NormalVec(pt, height))
   m = ncol(P)
   n = length(pt)
@@ -299,22 +306,26 @@ OneFrechet <- function (pt, P, height){
     c = c+1
     if (all(current == newpt)) {status = TRUE}
     else if (identical (Infos(newpt, P), Infos(current, P))){
-      return (list(Infos(newpt, P), Infos(current, P)))
-      cand = Cand (infosNewpt, P, height)
+      #return (list(Infos(newpt, P), Infos(current, P)))
+      cand = Cand (Infos(newpt, P), P, height)
+      #print('here1')
       if (IsFrechet(cand, P)) {
         status = TRUE
         current = cand
       }
       else{
+        #print('here2')
         status = IsFrechet(newpt, P)
         current = newpt
       }
     }
     else {
+      #print('here3')
       status = IsFrechet(newpt, P)
       current = newpt
     }
   }
+  #print('here4')
   if (IsFrechet(current, P) == FALSE) print("Failure")
   return (current)
 }
@@ -502,6 +513,7 @@ FMPolytope <- function (p, P, height){
 Frechet <- function (P, heigth){
   n = nrow(P)
   pt = OneFrechet(rep(heigth, n), P, heigth)
+  #print('here5')
   if (IsFrechet(pt, P)==FALSE) return("Could not find one Frechet Mean")
   else (return (list (pt, FMPolytope(pt, P, heigth))))
 }
@@ -536,12 +548,38 @@ p = c(1/5, 2/5, 2, 2/5, 2, 2)
 sp2 = cbind(c(1/5, 2/5, 2, 2/5, 2, 2), c(2, 2, 2, 2/5, 2/5, 1/5), c(2/5, 2/5, 2, 1/5, 2, 2))
 FMPolytope(p, sp2, 2)
 
-sp1 = cbind(c(9/100, 19/50, 19/50, 1, 19/50, 19/50, 1, 19/50, 1, 1), c(1, 1, 1, 1, 21/100, 57/100, 61/100, 57/100, 61/100, 61/100), c(31/50, 1, 49/50, 49/50, 1, 49/50, 49/50, 1, 1, 63/100), c(1, 1, 1, 47/100, 7/50, 4/5, 1, 4/5, 1, 1))
+sp1 = cbind(c(9/100, 19/50, 19/50, 1, 19/50, 19/50, 1, 19/50, 1, 1, 49/50, 17/50, 1 , 49/100, 57/100),
+            c(1, 1, 1, 1, 21/100, 57/100, 61/100, 57/100, 61/100, 61/100,1 ,49/50, 61/100, 57/100 , 1),
+            c(31/50, 1, 49/50, 49/50, 1, 49/50, 49/50, 1, 1, 63/100, 61/100, 19/50, 1, 4/5, 49/50), 
+            c(1, 1, 1, 47/100, 7/50, 4/5, 1, 4/5, 1, 1, 49/50, 57/100, 31/50,61/100, 19/50 ))
+
 p = c(48/25, 48/25, 48/25, 193/100, 8/5, 43/25, 2, 43/25, 2, 193/100)
 fmp = FMPolytope(p, sp1, 2)
 
-  
+sp3 = cbind(c(0,0,0), c(0,2,4), c(0,1,3), c(0,5,1))
+plot(c(0, 2, 5, 1,  2),c(0, 4, 1, 3,  2), pch = 16, col = c('black', 'black', 'black', 'black', 'red'))
+
 FMsp1 = Frechet(sp1, 2)
 FMsp2 =Frechet(sp2, 2)
 FMskinny = Frechet(skinny, 2)
-  
+FMsp3 =Frechet(fat, 4)
+
+a = c(0,0,0)
+b = c(0,448,449)
+c = c(0,452,256)
+undefined = cbind(a,b,c)
+FMsp3 =Frechet(undefined, 256)
+
+set.seed(110898)
+times = c()
+for (n in 2:15){
+  print(n)
+  tic = Sys.time()
+  P = matrix(runif(4*n), nrow = n)
+  Frechet(P,2)
+  toc = Sys.time()
+  times = c(times, toc-tic)
+}
+plot(2:15, times, type = 'b',  lty = 2, col = 'blue', pch = 16)
+
+

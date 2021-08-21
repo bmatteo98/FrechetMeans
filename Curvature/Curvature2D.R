@@ -149,10 +149,10 @@ plotTR2 <- function (P, cv){
   trLine = c()
   t = seq(0,1, length.out = 200)
   for (ti in t){
-    trLine = rbind(trLine, tropicalLine(x,y,ti))
+    trLine = rbind(trLine, tropicalLine(a,b,ti))
   }
   par(mfrow=c(2,2), mar = rep(2, 4))
-  plot(trLine[,1], trLine[,2], type = 'l', col = 'red', xlim = xl, ylim = yl, main = paste("Curvature: ",cv))
+  lines(trLine[,1], trLine[,2], type = 'l', col = 'black')#, xlim = xl, ylim = yl, main = paste("Curvature: ",cv))
   trLine = c()
   for (ti in t){
     trLine = rbind(trLine, tropicalLine(y,z,ti))
