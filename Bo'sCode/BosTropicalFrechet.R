@@ -621,5 +621,5 @@ library(ggplot2)
 df = as.data.frame(cbind(2:10, times ))
 ggplot(data=df, aes(x=V1, y=times, group=1)) +
   geom_line(linetype = "dashed", col= 'blue')+
-  geom_point(col = 'blue') + scale_y_continuous(breaks=c(seq(0,400,50), times[9]))+ scale_x_continuous(breaks=seq(2,10,1))
+  geom_point(col = 'blue') + scale_y_continuous(breaks=c(seq(0,400,50), times))+ scale_x_continuous(breaks=seq(2,10,1))
 
