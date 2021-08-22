@@ -2,6 +2,7 @@ library(limSolve) # feasibility
 library(Deriv) # compute derivative of a poly
 library(rSymPy)  # solve derivative = 0
 library(rje) # powerset
+library(stringr)
 
 Peakpairs <- function (l1,l2){ # l1, l2 are vectors
 
@@ -505,7 +506,7 @@ FMPolytope <- function (p, P, height){
   current =list(pnormal)
   nextround = list(1)
   while (length(nextround) != 0){
-
+    print(length(vertices))
     nextround = list()
     for (pt in current){
       flats = FlatDirs(pt, P)

@@ -540,8 +540,9 @@ sp1 = cbind(c(9/100, 19/50, 19/50, 1, 19/50, 19/50, 1, 19/50, 1, 1), c(1, 1, 1, 
 p = c(48/25, 48/25, 48/25, 193/100, 8/5, 43/25, 2, 43/25, 2, 193/100)
 fmp = FMPolytope(p, sp1, 2)
 
-  
+
 FMsp1 = Frechet(sp1, 2)
 FMsp2 =Frechet(sp2, 2)
 FMskinny = Frechet(skinny, 2)
+
   
