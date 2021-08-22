@@ -506,7 +506,7 @@ FMPolytope <- function (p, P, height){
   current =list(pnormal)
   nextround = list(1)
   while (length(nextround) != 0){
-    print(length(vertices))
+    #print(length(vertices))
     nextround = list()
     for (pt in current){
       flats = FlatDirs(pt, P)
@@ -518,7 +518,9 @@ FMPolytope <- function (p, P, height){
         candidate = candidates [[index]]
         dist = dists [index]
         pnew = NormalVec(AddPerturb(pt, candidate, c(), dist), height)
-        
+        # if (length(vertices) == 64){
+        # print(pnew)
+        #   print(P)}
         if ((inList(pnew, vertices) == FALSE) && (inList(pnew, current) == FALSE) && (inList(pnew, nextround) == FALSE) && (IsVertex(pnew, P))){
           nextround[[length(nextround)+1]] =  pnew
           vertices[[length(vertices)+1]] =  pnew
@@ -579,7 +581,12 @@ fmp = FMPolytope(p, sp1, 2)
 sp3 = cbind(c(0,0,0), c(0,2,4), c(0,1,3), c(0,5,1))
 plot(c(0, 2, 5, 1,  2),c(0, 4, 1, 3,  2), pch = 16, col = c('black', 'black', 'black', 'black', 'red'))
 
+
+tic = Sys.time()
 FMsp1 = Frechet(sp1, 2)
+toc = Sys.time()
+toc-tic
+
 FMsp2 =Frechet(sp2, 2)
 FMskinny = Frechet(skinny, 2)
 FMsp3 =Frechet(fat, 4)
@@ -588,19 +595,23 @@ a = c(0,0,0)
 b = c(0,448,449)
 c = c(0,452,256)
 undefined = cbind(a,b,c)
-FMsp3 =Frechet(undefined, 256)
+Frechet(undefined, 256)
+
+#P contains points on the columns
 
 set.seed(110898)
 times = c()
 for (n in 2:10){
   print(n)
   tic = Sys.time()
-  P = matrix(runif(4*n), nrow = n)
+  P = matrix(runif(4*n), ncol = n)
+  print(P)
   Frechet(P,2)
   toc = Sys.time()
   times = c(times, toc-tic)
 }
 times = c(0.7184191,  0.2761981  ,0.5801570  ,0.3149991,  0.4561300  ,0.7781529  ,2.6835811, 45.7300069,  6.3897410*60)
+times= 
 par(mar=c(5,6,4,1)+.1)
 plot(2:10, times, type = 'b',  lty = 2, col = 'blue', pch = 16, xaxt="n", yaxt="n",ylab = ' ', xlab= ' ')
 axis(1,   at = seq(2, 10, by = 1), las=2)

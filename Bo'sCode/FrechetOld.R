@@ -481,12 +481,13 @@ FMPolytope <- function (p, P, height){
       candidates = flats[[1]]
       if (length(candidates) == 0) return(list(minsum, length(vertices), vertices))
       dists = unlist(flats[[2]])
-      #print(length(candidates))
       for (index in 1:length(candidates)){
         candidate = candidates [[index]]
         dist = dists [index]
+        if (length(vertices) == 64){
+          print(pnew)
+          print(P)}
         pnew = NormalVec(AddPerturb(pt, candidate, c(), dist), height)
-        
         if ((inList(pnew, vertices) == FALSE) && (inList(pnew, current) == FALSE) && (inList(pnew, nextround) == FALSE) && (IsVertex(pnew, P))){
           nextround[[length(nextround)+1]] =  pnew
           vertices[[length(vertices)+1]] =  pnew
@@ -540,8 +541,11 @@ sp1 = cbind(c(9/100, 19/50, 19/50, 1, 19/50, 19/50, 1, 19/50, 1, 1), c(1, 1, 1, 
 p = c(48/25, 48/25, 48/25, 193/100, 8/5, 43/25, 2, 43/25, 2, 193/100)
 fmp = FMPolytope(p, sp1, 2)
 
-
+tic = Sys.time()
 FMsp1 = Frechet(sp1, 2)
+toc = Sys.time()
+toc-tic
+
 FMsp2 =Frechet(sp2, 2)
 FMskinny = Frechet(skinny, 2)
 
