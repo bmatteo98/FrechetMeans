@@ -1,16 +1,9 @@
-# 2020 r code for computing Frechet means under the tropical metric 
 library(limSolve) # feasibility 
 library(Deriv) # compute derivative of a poly
 library(rSymPy)  # solve derivative = 0
 library(rje) # powerset
 
-# criterion of Frechet means
-
-Peakpairs <- function (l1,l2){ 
-  # pairs of indices that attain the tropical distrance
-  # l1, l2 are vectors
-  # l1 is a potential Frechet mean
-  # l2 is a point in the sample
+Peakpairs <- function (l1,l2){ # l1, l2 are vectors
   n <- length(l1)
   if (n != length(l2)) return ("unequal length of lists")
   diff = round(l1-l2, 3)
@@ -18,17 +11,11 @@ Peakpairs <- function (l1,l2){
   minim = min(diff)
   i = which((diff) == maxim)
   j = which((diff) == minim)
-  # all combinations of the indices that give the mins and the maxs
   return (as.matrix(expand.grid(i,j)))
 }
 
 
-IsFrechet <- function (p, L) {
-  # checks feasibility of the linear system
-  # follows from theorem on weighted combinations of quadratic functions
-  # L is a (m x n) matrix, m = dimension of the points, n =  number of points in the sample
-  # L contains a sample of points on the columns
-  # p is a vector, potential Frechet mean
+IsFrechet <- function (p, L) {# L is a matrix, p is a vector
   m = ncol(L)
   n = length(p)
   allpeaks = Peakpairs(p, L[,1])
@@ -39,11 +26,13 @@ IsFrechet <- function (p, L) {
     pp = pp[order(pp[,2]),]
     allpeaks = rbind(allpeaks,pp)
   }
+  #allpeaks [4:6,] = rbind(c(2,1,4), c(2,1,5), c(2,1,6))
   S = matrix(0, nrow = n, ncol = nrow(allpeaks))
   for (j in 1: nrow(allpeaks)){
     peack = allpeaks[j,]
     S[peack[2], j] = p[peack[2]] - p[peack[3]] + L[ peack[3], peack[1]] - L[ peack[2], peack[1]]
     S[peack[3], j] = p[peack[3]] - p[peack[2]] + L[ peack[2], peack[1]] - L[peack[3], peack[1]]
+    #print(S)
   }
   w = matrix(0, nrow = m, ncol = nrow(allpeaks))
   for (i in 1:m){
@@ -57,14 +46,10 @@ IsFrechet <- function (p, L) {
   
 }
 
-# normalize to a certain height (same point in the tropical projective torus)
+
 NormalVec <-function (p,height) p-max(p)+height
 
-# Steepest descent approach to search for one exact FM
-
-Infor <- function (l1,l2, pv){ 
-  # Information on peacks and valleys
-  # l1, l2 are vectors
+Infor <- function (l1,l2, pv){ # l1, l2 are vectors
   n <- length(l1)
   if (n != length(l2)) return ("unequal length of lists")
   dif = round(l1-l2, 4)
@@ -90,7 +75,7 @@ DescendPerturb <- function (p1, p2, incr, decr) {
   if (length(intersect(peaks,incr)) != 0){ep = 1} 
   else if (all(peaks %in% decr)) {ep = -1 }
   else {ep = 0}
-  if (length(intersect(valleys,decr)) != 0) {ev = -1} 
+  if (length(intersect(valleys,decr)) != 0) {ev = -1} #??
   else if (all(valleys %in% incr)) {ev = 1 }
   else {ev = 0}
   
@@ -115,7 +100,6 @@ DescendPerturb <- function (p1, p2, incr, decr) {
 }
 
 Infos <- function(p1, P){
-  # information on peacks and valleys with respect to all points in the sample
   L = list()
   j = 0
   for (i in 1:ncol(P)){
@@ -258,10 +242,8 @@ Cand <- function (newpt, P, height){
   return(NormalVec(atl , height)) 
 }
 
-# tropical distance
 dtr <- function(l1, l2) max(l1-l2) - min(l1-l2) 
 
-#sum of squares tropical distance
 ssq <- function (pt , P) {
   ssq = 0
   for (i in 1:ncol(P)){
@@ -272,9 +254,6 @@ ssq <- function (pt , P) {
 }
 
 OneFrechet <- function (pt, P, height){
-  # pt is the origin (any point of the kind rep(heigth))
-  # P is a (m x n) matrix, m = dimension of the points, n =  number of points in the sample
-  # P contains a sample of points on the columns
   if (IsFrechet(pt, P)) return (NormalVec(pt, height))
   m = ncol(P)
   n = length(pt)
@@ -340,7 +319,7 @@ OneFrechet <- function (pt, P, height){
   return (current)
 }
 
-# flat directions
+
 
 FlatPerturb <- function (p1, p2, incr, decr) {
   dif = p1 - p2
@@ -375,7 +354,6 @@ FlatPerturb <- function (p1, p2, incr, decr) {
 #FlatPerturb(c(0, 0, 0, 0, 2, 0.4), c(1/5, 2/5, 2, 2/5, 2, 2), c(1, 2, 3, 5, 6), c())
 
 closure <- function(Info , pos, ind){
-  #If ind belongs to incr (pos=1) or decr (pos=2), the other indices that must belong too.
   o = c()
   new = c(ind)
   while (identical(o,new) == FALSE){
@@ -392,7 +370,7 @@ closure <- function(Info , pos, ind){
 }
 
 closures <- function (Info, pos, n){
-  #The list of all possible closures for incr (pos=1) or decr (pos=2).
+  
   cls = lapply(1:n, function(i) closure(Info, pos, i))
   o = cls
   for (cl in o){
@@ -422,6 +400,7 @@ closures <- function (Info, pos, n){
   return (unique(o))
 }
 
+#candidates = closures(infos, 1,6)
 
 AddPerturb <- function (p, incr , decr, dist){
   output = p
@@ -433,8 +412,6 @@ AddPerturb <- function (p, incr , decr, dist){
 }
 
 FlatDirs <- function (p, P){
-  # The directions with slope zero at a Frechet mean p. 
-  # If p is a vertex of the polytope of Frechet means, status is true.
   n = nrow(P)
   infos = apply(P, 2, function(x) list(Infor(p, x, 1), Infor(p, x, 2)))
   candidates = closures (infos, 1, n)
@@ -477,6 +454,7 @@ OneVertex <- function (p, P, height){
   }
   return (pt)
 }
+#OneVertex(p, sp2, 2)
 
 inList <- function (vec, list){
   if (length(list)==0) return (FALSE)
@@ -496,12 +474,14 @@ FMPolytope <- function (p, P, height){
   current =list(pnormal)
   nextround = list(1)
   while (length(nextround) != 0){
+    #print(nextround)
     nextround = list()
     for (pt in current){
       flats = FlatDirs(pt, P)
       candidates = flats[[1]]
       if (length(candidates) == 0) return(list(minsum, length(vertices), vertices))
       dists = unlist(flats[[2]])
+      #print(length(candidates))
       for (index in 1:length(candidates)){
         candidate = candidates [[index]]
         dist = dists [index]
@@ -515,7 +495,7 @@ FMPolytope <- function (p, P, height){
     }
     current = nextround
   }
-  return (list(tropDistance = minsum, numberFrechet = length(vertices), FMs = vertices))
+  return (list(minsum, length(vertices), vertices))
 }
 
 
@@ -525,7 +505,6 @@ Frechet <- function (P, heigth){
   if (IsFrechet(pt, P)==FALSE) return("Could not find one Frechet Mean")
   else (return (list (oneFrechet = pt, FMPolytope = FMPolytope(pt, P, heigth))))
 }
-
 
 
 
@@ -560,8 +539,7 @@ sp1 = cbind(c(9/100, 19/50, 19/50, 1, 19/50, 19/50, 1, 19/50, 1, 1), c(1, 1, 1, 
 p = c(48/25, 48/25, 48/25, 193/100, 8/5, 43/25, 2, 43/25, 2, 193/100)
 fmp = FMPolytope(p, sp1, 2)
 
-  
+
 FMsp1 = Frechet(sp1, 2)
 FMsp2 =Frechet(sp2, 2)
 FMskinny = Frechet(skinny, 2)
-  
