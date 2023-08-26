@@ -115,7 +115,7 @@ DescendPerturb <- function (p1, p2, incr, decr) {
 }
 
 Infos <- function(p1, P){
-  # information on peaks and valleys with respect to all points in the sample
+  # information on Fpeaks and valleys with respect to all points in the sample
   L = list()
   j = 0
   for (i in 1:ncol(P)){
@@ -229,7 +229,7 @@ unstring <- function (sol, n){
 Cand <- function (newpt, P, height){
   m = ncol(P)
   n = nrow(P)
-  infos = Infos(newpt,sp2)
+  infos = Infos(newpt,P)
   if (length(infos) !=2*m) return ("error, lengths do not match")
   ec = EquivClass(infos, P, rep(0, n))
   atlas = ec[[2]]
@@ -320,7 +320,7 @@ OneFrechet <- function (pt, P, height){
     if (all(current == newpt)) {status = TRUE}
     else if (identical (Infos(newpt, P), Infos(current, P))){
       #return (list(Infos(newpt, P), Infos(current, P)))
-      cand = Cand (infosNewpt, P, height)
+      cand = Cand (Infos(newpt, P), P, height)
       if (IsFrechet(cand, P)) {
         status = TRUE
         current = cand
@@ -524,9 +524,6 @@ Frechet <- function (P, heigth){
   if (IsFrechet(pt, P)==FALSE) return("Could not find one Frechet Mean")
   else (return (list (oneFrechet = pt, FMPolytope = FMPolytope(pt, P, heigth))))
 }
-
-
-
 
 
 # examples
