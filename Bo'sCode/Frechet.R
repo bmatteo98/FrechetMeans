@@ -281,7 +281,7 @@ OneFrechet <- function (pt, P, height){
   status = FALSE
   current = pt
   c = 0
-  while ((status != TRUE) & (c<=10)){
+  while ((status != TRUE) & (c<=100)){
     info = Infos(current, P)
     dtrs=c()
     allcandidates = list()
